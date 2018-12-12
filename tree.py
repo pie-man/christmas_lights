@@ -86,7 +86,7 @@ if __name__ == '__main__':
 
     count=len(function_list)-1
     #for function in function_list:
-    while datetime.now().minute < 57:
+    while datetime.now().hour < 18:
         count=count+1
         if count >= len(function_list):
             count=0
@@ -100,9 +100,9 @@ if __name__ == '__main__':
                              reverse=middle_actor[3])
         cluster.add_function(bottom_actor[0], bottom_actor[1], attribute=bottom_actor[2],
                              reverse=bottom_actor[3])
-        print("Running a function... at {0}".format(datetime.now().minute))
+        #print("Running a function... at {0}".format(datetime.now()))
         cluster.run_bundle()
-    print("closing down... at {0}".format(datetime.now().minute))
+    #print("closing down... at {0}".format(datetime.now()))
     (top_actor, middle_actor, bottom_actor) = set_to_black()
     stepcount = 120
     cluster = q.bundle(pixels, wait=0.5, steps=stepcount)
