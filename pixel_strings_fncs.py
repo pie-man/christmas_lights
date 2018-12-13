@@ -121,6 +121,23 @@ def rotate_state(pixels, index, skip=1, steps=25, reverse=False):
             print('rotate state, iter = {0:3d}'.format(step))
         yield
 
+def rainbow_cycle_II(pixels, index, attribute=(256, 256,1), steps=25, reverse=False):
+    " light up the full block of pixels and then cycle the colours around"
+    full_wheel = attribute[0]
+    arc_span   = attribute[1]
+    laps       = attribute[2]
+    length = len(index)
+    # cycle through all spread colors in the wheel
+
+    for step in range(steps):
+        pixel_positions = get_wheel_position (length, step, steps,
+                laps=laps, full_wheel=full_wheel, arc_span=arc_span,
+                reverse=reverse)
+        for i in range(length):
+            colour = wheel(pixel_positions[i], spread=full_wheel)
+            pixels.set_pixel(index[i], colour )
+        yield # Return 'control' to main program somewhere
+
 def make_rainbow_state_rgb(index):
     active_pixels = len(index)
     rainbow_state = []
@@ -137,14 +154,21 @@ def make_rainbow_state(index):
         rainbow_state.append(colour)
     return rainbow_state
 
-def make_colour_state(index, rgb_colour):
+def make_colour_state_rgb(index, rgb_colour):
     active_pixels = len(index)
     colour_state = []
     for i in range(active_pixels):
         colour_state.append(rgb_colour)
     return colour_state
 
+def make_colour_state(index, colour):
+    '''Cheat a bit here : we're making an array of whatever we got
+    passed, so an int can be treated the same as a tuple'''
+    return make_colour_state_rgb(index, colour)
+
 class Pixel_Section:
+    """Don't use this object - it's deprecated and the code here is
+       just waiting to be moved out into the new 'iterator' format"""
     def __init__(self, leds, offset, length, step=1):
         max_pixels=leds.count()
         if offset > max_pixels:
@@ -177,21 +201,6 @@ class Pixel_Section:
             yield
             count += 1
  
-    def rainbow_cycle(self, steps=10,
-                         full_wheel=256, arc_span=256,
-                         laps=1, reverse=False):
-        " light up the full block of pixels and then cycle the colours around"
-        # cycle through all spread colors in the wheel
-
-        for step in range(steps):
-            pixel_positions = get_wheel_position ( self.length, step, steps,
-                    laps=laps, full_wheel=full_wheel, arc_span=arc_span,
-                    reverse=reverse)
-            for i in range(self.length):
-                colour = wheel(pixel_positions[i], spread=full_wheel)
-                self.pixels.set_pixel(self.index[i], colour )
-            yield # Return 'control' to main program somewhere
-
     def light_up_successive(self, steps=10, colour=(127,127,127), reverse=False):
         clusters = pixels_by_step(self.length, steps)
         if reverse:
