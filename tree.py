@@ -43,7 +43,6 @@ def set_random_rings():
     '''Set the three rings of the tree to display static
        rings of random colours'''
     top_state = q.make_colour_state(TOP, q.get_random_colour_rgb())
-    print(top_state)
     middle_state = q.make_colour_state(MIDDLE, q.get_random_colour_rgb())
     bottom_state = q.make_colour_state(BOTTOM, q.get_random_colour_rgb())
     top_actor    = (q.fade_to_state_rgb, TOP, top_state, False)
@@ -102,14 +101,15 @@ if __name__ == '__main__':
                              reverse=bottom_actor[3])
         #print("Running a function... at {0}".format(datetime.now()))
         cluster.run_bundle()
+
     #print("closing down... at {0}".format(datetime.now()))
     (top_actor, middle_actor, bottom_actor) = set_to_black()
     stepcount = 120
     cluster = q.bundle(pixels, wait=0.5, steps=stepcount)
-    cluster.add_function(top_actor[0], top_actor[1], attribute=top_actor[2],
-                         reverse=top_actor[3])
-    cluster.add_function(middle_actor[0], middle_actor[1], attribute=middle_actor[2],
-                         reverse=middle_actor[3])
-    cluster.add_function(bottom_actor[0], bottom_actor[1], attribute=bottom_actor[2],
-                         reverse=bottom_actor[3])
+    cluster.add_function(top_actor[0], top_actor[1],
+                         attribute=top_actor[2], reverse=top_actor[3])
+    cluster.add_function(middle_actor[0], middle_actor[1],
+                         attribute=middle_actor[2], reverse=middle_actor[3])
+    cluster.add_function(bottom_actor[0], bottom_actor[1],
+                         attribute=bottom_actor[2], reverse=bottom_actor[3])
     cluster.run_bundle()
