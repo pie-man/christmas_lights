@@ -102,6 +102,7 @@ if __name__ == '__main__':
         #print("Running a function... at {0}".format(datetime.now()))
         cluster.run_bundle()
 
+    # Shut it all down quietly...
     #print("closing down... at {0}".format(datetime.now()))
     (top_actor, middle_actor, bottom_actor) = set_to_black()
     stepcount = 120
