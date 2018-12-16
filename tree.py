@@ -73,7 +73,6 @@ if __name__ == '__main__':
     pixels = q.initialise_pixels(PIXEL_COUNT)
     function_list = [
             set_random_rings,
-            set_to_black,
             set_r_g_and_b_rings,
             set_rainbows,
             cycling_rainbows,
