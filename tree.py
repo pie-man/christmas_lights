@@ -54,9 +54,9 @@ def set_random_rings():
 def set_to_black():
     '''fade all three rings to black'''
     dummy = "not required"
-    top_actor    = (q.fade_to_black, TOP, dummy, False)
-    middle_actor = (q.fade_to_black, MIDDLE, dummy, False)
-    bottom_actor = (q.fade_to_black, BOTTOM, dummy, False)
+    top_actor    = (q.fade_to_color_rgb, TOP, (1,1,1), False)
+    middle_actor = (q.fade_to_color_rgb, MIDDLE, (1,1,1), False)
+    bottom_actor = (q.fade_to_color_rgb, BOTTOM, (1,1,1), False)
     #return (top_state, middle_state, bottom_state)
     return (top_actor, middle_actor, bottom_actor)
 
@@ -73,6 +73,7 @@ if __name__ == '__main__':
     pixels = q.initialise_pixels(PIXEL_COUNT)
     function_list = [
             set_random_rings,
+            set_to_black,
             set_r_g_and_b_rings,
             set_rainbows,
             cycling_rainbows,
@@ -85,7 +86,8 @@ if __name__ == '__main__':
 
     count=len(function_list)-1
     #for function in function_list:
-    while datetime.now().hour < 18:
+    while datetime.now().hour < 22:
+        print ("doing a thing")
         count=count+1
         if count >= len(function_list):
             count=0
