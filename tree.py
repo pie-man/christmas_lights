@@ -86,8 +86,7 @@ if __name__ == '__main__':
 
     count=len(function_list)-1
     #for function in function_list:
-    while datetime.now().hour < 22:
-        print ("doing a thing")
+    while datetime.now().hour < 18:
         count=count+1
         if count >= len(function_list):
             count=0
