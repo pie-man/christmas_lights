@@ -16,66 +16,93 @@ BOTTOM = range(7)
 print_level=1
 threshold=1
 
+def set_rainbow_ring(index):
+    '''Set the lights  refered to by index to
+       a full rainbow spread'''
+    debug_print("enetered set_rainbow_ring")
+    state = q.make_rainbow_state_rgb(index)
+    actor = (q.fade_to_state_rgb, index, state, False)
+    return actor
+
 def set_rainbows():
     '''Set the three rings of the tree to display a static
        loop of rainbow colours'''
 
     debug_print("enetered set_rainbows(): ")
-    top_state = q.make_rainbow_state_rgb(TOP)
-    middle_state = q.make_rainbow_state_rgb(MIDDLE)
-    bottom_state = q.make_rainbow_state_rgb(BOTTOM)
-    top_actor    = (q.fade_to_state_rgb, TOP, top_state, False)
-    middle_actor = (q.fade_to_state_rgb, MIDDLE, middle_state, True)
-    bottom_actor = (q.fade_to_state_rgb, BOTTOM, bottom_state, False)
-    #return (top_state, middle_state, bottom_state)
+    top_actor    = set_rainbow_ring(TOP)
+    middle_actor = set_rainbow_ring(MIDDLE)
+    bottom_actor = set_rainbow_ring(BOTTOM)
     return (top_actor, middle_actor, bottom_actor)
+
+def set_r_g_or_b_ring(index):
+    '''Randomly set an index to one of red, green or blue'''
+    debug_print("enetered set_r_g_or_b_ring")
+    colours = [(200, 0, 0), (0, 200, 0), (0, 0, 200)]
+    state = q.make_colour_state(index, colours[randint(0,len(colours)-1)])
+    actor = (q.fade_to_state_rgb, index, state, False)
+    return (actor)
 
 def set_r_g_and_b_rings():
     '''Set the three rings of the tree to display static
        rings of red, green or blue'''
     debug_print("enetered set_r_g_and_b_rings")
-    colours = [(200, 0, 0), (0, 200, 0), (0, 0, 200)]
-    top_state = q.make_colour_state(TOP, colours[randint(0,2)])
-    middle_state = q.make_colour_state(MIDDLE, colours[randint(0,2)])
-    bottom_state = q.make_colour_state(BOTTOM, colours[randint(0,2)])
-    top_actor    = (q.fade_to_state_rgb, TOP, top_state, False)
-    middle_actor = (q.fade_to_state_rgb, MIDDLE, middle_state, False)
-    bottom_actor = (q.fade_to_state_rgb, BOTTOM, bottom_state, False)
-    #return (top_state, middle_state, bottom_state)
+    top_actor    = set_r_g_or_b_ring(TOP)
+    middle_actor = set_r_g_or_b_ring(MIDDLE)
+    bottom_actor = set_r_g_or_b_ring(BOTTOM)
     return (top_actor, middle_actor, bottom_actor)
+
+def set_random_colour_ring(index):
+    '''Set an index to a random colour'''
+    debug_print("enetered set_random_colour_ring ")
+    state = q.make_colour_state(index, q.get_random_colour_rgb())
+    actor = (q.fade_to_state_rgb, index, state, False)
+    return (actor)
 
 def set_random_rings():
     '''Set the three rings of the tree to display static
        rings of random colours'''
     debug_print("enetered set_random_rings")
-    top_state = q.make_colour_state(TOP, q.get_random_colour_rgb())
-    middle_state = q.make_colour_state(MIDDLE, q.get_random_colour_rgb())
-    bottom_state = q.make_colour_state(BOTTOM, q.get_random_colour_rgb())
-    top_actor    = (q.fade_to_state_rgb, TOP, top_state, False)
-    middle_actor = (q.fade_to_state_rgb, MIDDLE, middle_state, False)
-    bottom_actor = (q.fade_to_state_rgb, BOTTOM, bottom_state, False)
-    #return (top_state, middle_state, bottom_state)
+    top_actor    = set_random_colour_ring(TOP)
+    middle_actor = set_random_colour_ring(MIDDLE)
+    bottom_actor = set_random_colour_ring(BOTTOM)
     return (top_actor, middle_actor, bottom_actor)
+
+def set_ring_to_black(index):
+    '''Set an index to the go black'''
+    debug_print("enetered set_ring_to_black ")
+    dummy = "not required"
+    actor = (q.fade_to_black, index, dummy, False)
+    return (actor)
 
 def set_to_black():
     '''fade all three rings to black'''
     debug_print("enetered set_to_black(): ")
-    dummy = "not required"
-    top_actor    = (q.fade_to_black, TOP, dummy, False)
-    middle_actor = (q.fade_to_black, MIDDLE, dummy, False)
-    bottom_actor = (q.fade_to_black, BOTTOM, dummy, False)
-    #return (top_state, middle_state, bottom_state)
+    top_actor    = set_ring_to_black(TOP)
+    middle_actor = set_ring_to_black(MIDDLE)
+    bottom_actor = set_ring_to_black(BOTTOM)
     return (top_actor, middle_actor, bottom_actor)
+
+def set_ring_to_dim(index):
+    '''Set an index to the go almost black'''
+    debug_print("enetered set_ring_to_dim ")
+    actor    = (q.fade_to_color_rgb, index, (1,1,1), False)
+    return (actor)
 
 def set_to_dim():
     '''fade all three rings to black'''
     debug_print("enetered set_to_dim():")
-    dummy = "not required"
-    top_actor    = (q.fade_to_color_rgb, TOP, (1,1,1), False)
-    middle_actor = (q.fade_to_color_rgb, MIDDLE, (1,1,1), False)
-    bottom_actor = (q.fade_to_color_rgb, BOTTOM, (1,1,1), False)
-    #return (top_state, middle_state, bottom_state)
+    top_actor    = set_ring_to_dim(TOP)
+    middle_actor = set_ring_to_dim(MIDDLE)
+    bottom_actor = set_ring_to_dim(BOTTOM)
     return (top_actor, middle_actor, bottom_actor)
+
+def set_ring_to_cycling_rainbow(index):
+    '''Set an index to display a rainbow
+       pattern and gently cycle it around the ring.
+       Please only run this AFTER set_rainbow_ring'''
+    debug_print("enetered set_ring_to_cycling_rainbow ")
+    actor    = (q.rainbow_cycle_II, index, (256, 256, 2), False)
+    return (actor)
 
 def cycling_rainbows():
     '''Set the three rings of the tree to display a rainbow
@@ -87,26 +114,15 @@ def cycling_rainbows():
     bottom_actor = (q.rainbow_cycle_II, BOTTOM, (256, 256, 6), False)
     return (top_actor, middle_actor, bottom_actor)
 
-def wibble_1(index):
-    debug_print("enetered wibble_1")
-    state = q.make_rainbow_state_rgb(index)
-    actor = (q.fade_to_state_rgb, index, state, False)
-    return actor
-
-def set_r_g_or_b_ring(index):
-    '''Set a ring to one of red, green or blue'''
-    debug_print("enetered set_r_g_or_b_ring")
-    colours = [(200, 0, 0), (0, 200, 0), (0, 0, 200)]
-    state = q.make_colour_state(index, colours[randint(0,2)])
-    actor = (q.fade_to_state_rgb, index, state, False)
-    return (actor)
-
 def set_right_random_wibblefest():
     '''Selects 3 funtions randomly and assigns one to each ring'''
     debug_print("enetered set_right_random_wibblefest(): ")
     list_of_functions = [
-            wibble_1,
+            set_rainbow_ring,
             set_r_g_or_b_ring,
+            set_ring_to_cycling_rainbow,
+            set_random_colour_ring,
+            set_ring_to_cycling_rainbow,
             ]
     selection = randint(0, len(list_of_functions)-1 )
     top_actor    = list_of_functions[selection](TOP)
