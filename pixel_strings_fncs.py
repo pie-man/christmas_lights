@@ -77,7 +77,8 @@ def fade_to_state_rgb(pixels, index, new_state, steps=25, reverse=False):
         scale_out = int(100*( steps - (step + 1.0) ) / steps)
         scale_in  = 100 - scale_out
         if DEBUG:
-            print("Scale_out = {0:3d}, scale_in = {1:3d}".format(scale_out, scale_in))
+            print("Scale_out = {0:3d}, scale_in = {1:3d}".format(
+                scale_out, scale_in))
         temp_state=[]
         for i in range(active_pixels):
             old_r, old_g, old_b = old_state[i]
@@ -93,7 +94,8 @@ def fade_to_state_rgb(pixels, index, new_state, steps=25, reverse=False):
             print(temp_state[0:5])
         yield
 
-def fade_to_color_rgb(pixels, index, color=(0, 0, 0), steps=25, reverse=False):
+def fade_to_color_rgb(pixels, index, color=(0, 0, 0),
+        steps=25, reverse=False):
     active_pixels = len(index)
     new_state = []
     for i in range(active_pixels):
@@ -104,7 +106,8 @@ def fade_to_black(pixels, index, dummy_attr, steps=25, reverse=False):
     return fade_to_color_rgb(pixels, index, color=(0, 0, 0), steps=steps)
 
 def fade_to_white(pixels, index, dummy_attr, steps=25, reverse=False):
-    return fade_to_color_rgb(pixels, index, color=(255, 255, 255), steps=steps)
+    return fade_to_color_rgb(pixels, index, color=(255, 255, 255),
+                             steps=steps)
 
 def rotate_state(pixels, index, skip=1, steps=25, reverse=False):
     active_pixels = len(index)

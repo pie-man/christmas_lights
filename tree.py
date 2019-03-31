@@ -8,6 +8,9 @@ from random import randint
 # Configure the count of pixels:
 PIXEL_COUNT = 50
 
+# Logical to enable/disable flashing or rapidly changing sequences.
+FLASHING=True
+
 # Define the 'index' of the three rings of pixels to be ued globally
 TOP    = range(25, 50)
 MIDDLE = range(7, 24)
@@ -101,7 +104,7 @@ def set_ring_to_cycling_rainbow(index):
        pattern and gently cycle it around the ring.
        Please only run this AFTER set_rainbow_ring'''
     debug_print("enetered set_ring_to_cycling_rainbow ")
-    actor    = (q.rainbow_cycle_II, index, (256, 256, 2), False)
+    actor    = (q.rainbow_cycle, index, (256, 256, 2), False)
     return (actor)
 
 def cycling_rainbows():
@@ -109,9 +112,9 @@ def cycling_rainbows():
        pattern and gently cycle it around the ring.
        Please only run this AFTER set_to_rainbows'''
     debug_print("enetered cycling_rainbows(): ")
-    top_actor    = (q.rainbow_cycle_II, TOP   , (256, 256, 2), False)
-    middle_actor = (q.rainbow_cycle_II, MIDDLE, (256, 256, 4), True)
-    bottom_actor = (q.rainbow_cycle_II, BOTTOM, (256, 256, 6), False)
+    top_actor    = (q.rainbow_cycle, TOP   , (256, 256, 2), False)
+    middle_actor = (q.rainbow_cycle, MIDDLE, (256, 256, 4), True)
+    bottom_actor = (q.rainbow_cycle, BOTTOM, (256, 256, 6), False)
     return (top_actor, middle_actor, bottom_actor)
 
 def set_right_random_wibblefest():
