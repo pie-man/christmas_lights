@@ -181,7 +181,7 @@ def light_up_successive_rgb(pixels, index, new_state,
     if active_pixels != len(new_state):
         print("Error in fade_to_state_rgb : Length of states not consistent")
         return
-    clusters = pixels_by_step(actice_pixels, steps)
+    clusters = pixels_by_step(active_pixels, steps)
     if reverse:
         clusters.reverse()
     pixel_no = 0

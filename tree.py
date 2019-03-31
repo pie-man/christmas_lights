@@ -129,9 +129,9 @@ def set_successive_rainbows():
     '''Set the three rings of the tree to display a rainbow
     pattern by successively illuminating sections of the rings.'''
     debug_print("enetered cycling_rainbows(): ")
-    top_actor    = set_rainbow_ring_successive(TOP):
-    middle_actor = set_rainbow_ring_successive(MIDDLE):
-    bottom_actor = set_rainbow_ring_successive(BOTTOM):
+    top_actor    = set_rainbow_ring_successive(TOP)
+    middle_actor = set_rainbow_ring_successive(MIDDLE)
+    bottom_actor = set_rainbow_ring_successive(BOTTOM)
     return (top_actor, middle_actor, bottom_actor)
 
 def set_right_random_wibblefest():
@@ -183,7 +183,7 @@ if __name__ == '__main__':
 
     count=len(function_list)-1
     #for function in function_list:
-    while datetime.now().hour > 18:
+    while datetime.now().hour > 16:
         count=count+1
         if count >= len(function_list):
             count=0
