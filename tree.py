@@ -143,6 +143,7 @@ def set_right_random_wibblefest():
             set_ring_to_cycling_rainbow,
             set_random_colour_ring,
             set_ring_to_cycling_rainbow,
+            set_rainbow_ring_successive,
             ]
     selection = randint(0, len(list_of_functions)-1 )
     top_actor    = list_of_functions[selection](TOP)
@@ -169,15 +170,12 @@ if __name__ == '__main__':
             set_to_dim,
             set_random_rings,
             set_to_dim,
+            set_successive_rainbows,
             set_right_random_wibblefest,
             set_right_random_wibblefest,
             set_right_random_wibblefest,
             set_rainbows,
             cycling_rainbows,
-            set_to_dim,
-            ]
-    function_list = [
-            set_successive_rainbows,
             set_to_dim,
             ]
 
@@ -193,9 +191,11 @@ if __name__ == '__main__':
         cluster = q.bundle(pixels, wait=0.2, steps=stepcount)
         cluster.add_function(top_actor[0], top_actor[1], attribute=top_actor[2],
                              reverse=top_actor[3])
-        cluster.add_function(middle_actor[0], middle_actor[1], attribute=middle_actor[2],
+        cluster.add_function(middle_actor[0], middle_actor[1],
+                             attribute=middle_actor[2],
                              reverse=middle_actor[3])
-        cluster.add_function(bottom_actor[0], bottom_actor[1], attribute=bottom_actor[2],
+        cluster.add_function(bottom_actor[0], bottom_actor[1],
+                             attribute=bottom_actor[2],
                              reverse=bottom_actor[3])
         #print("Running a function... at {0}".format(datetime.now()))
         cluster.run_bundle()

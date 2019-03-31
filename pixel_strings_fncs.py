@@ -185,14 +185,16 @@ def light_up_successive_rgb(pixels, index, new_state,
     if reverse:
         clusters.reverse()
     pixel_no = 0
+    cluster_no = 0
     for cluster in clusters:
         for i in cluster:
             pixel_colour = Adafruit_WS2801.RGB_to_color(
-                    new_state[pixel_no][0], new_state[pixel_no][1],
-                    new_state[pixel_no][2])
+                    new_state[i][0], new_state[i][1],
+                    new_state[i][2])
             pixels.set_pixel(index[i], pixel_colour)
             pixel_no += 1
-        pixels.show()
+        #pixels.show()
+        cluster_no += 1
         yield
 
 class Pixel_Section:
@@ -288,7 +290,7 @@ def pixels_by_step(pixel_count, steps):
     # add an extra final element as we want 'steps' transiitons between
     # 2 points
     fred.append(pixel_count)
-    print ("fred is : {0:}".format(fred))
+    #print ("fred is : {0:}".format(fred))
     list_out=[]
     # loop over the transitions calculating which pixels are 'between' them
     for i in range(len(fred)-1):
