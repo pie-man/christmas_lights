@@ -19,10 +19,10 @@ BOTTOM = range(7)
 print_level=1
 threshold=1
 
-def set_rainbow_ring(index):
+def set_rainbow_ring_fade(index):
     '''Set the lights  refered to by index to
        a full rainbow spread'''
-    debug_print("enetered set_rainbow_ring")
+    debug_print("enetered set_rainbow_ring_fade")
     state = q.make_rainbow_state_rgb(index)
     actor = (q.fade_to_state_rgb, index, state, False)
     return actor
@@ -32,9 +32,9 @@ def set_rainbows():
        loop of rainbow colours'''
 
     debug_print("enetered set_rainbows(): ")
-    top_actor    = set_rainbow_ring(TOP)
-    middle_actor = set_rainbow_ring(MIDDLE)
-    bottom_actor = set_rainbow_ring(BOTTOM)
+    top_actor    = set_rainbow_ring_fade(TOP)
+    middle_actor = set_rainbow_ring_fade(MIDDLE)
+    bottom_actor = set_rainbow_ring_fade(BOTTOM)
     return (top_actor, middle_actor, bottom_actor)
 
 def set_r_g_or_b_ring(index):
@@ -102,7 +102,7 @@ def set_to_dim():
 def set_ring_to_cycling_rainbow(index):
     '''Set an index to display a rainbow
        pattern and gently cycle it around the ring.
-       Please only run this AFTER set_rainbow_ring'''
+       Please only run this AFTER a set_rainbow_ring function'''
     debug_print("enetered set_ring_to_cycling_rainbow ")
     actor    = (q.rainbow_cycle, index, (256, 256, 2), False)
     return (actor)
@@ -117,11 +117,28 @@ def cycling_rainbows():
     bottom_actor = (q.rainbow_cycle, BOTTOM, (256, 256, 6), False)
     return (top_actor, middle_actor, bottom_actor)
 
+def set_rainbow_ring_successive(index):
+    '''Set an index to display a rainbow pattern by successively
+    illuminating sections of the ring.'''
+    debug_print("enetered set_rainbow_ring_successive ")
+    state = q.make_rainbow_state_rgb(index)
+    actor = (q.light_up_successive_rgb, index, state, False)
+    return (actor)
+
+def set_successive_rainbows():
+    '''Set the three rings of the tree to display a rainbow
+    pattern by successively illuminating sections of the rings.'''
+    debug_print("enetered cycling_rainbows(): ")
+    top_actor    = set_rainbow_ring_successive(TOP):
+    middle_actor = set_rainbow_ring_successive(MIDDLE):
+    bottom_actor = set_rainbow_ring_successive(BOTTOM):
+    return (top_actor, middle_actor, bottom_actor)
+
 def set_right_random_wibblefest():
     '''Selects 3 funtions randomly and assigns one to each ring'''
     debug_print("enetered set_right_random_wibblefest(): ")
     list_of_functions = [
-            set_rainbow_ring,
+            set_rainbow_ring_fade,
             set_r_g_or_b_ring,
             set_ring_to_cycling_rainbow,
             set_random_colour_ring,
@@ -157,6 +174,10 @@ if __name__ == '__main__':
             set_right_random_wibblefest,
             set_rainbows,
             cycling_rainbows,
+            set_to_dim,
+            ]
+    function_list = [
+            set_successive_rainbows,
             set_to_dim,
             ]
 

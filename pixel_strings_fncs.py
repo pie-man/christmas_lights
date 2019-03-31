@@ -95,7 +95,7 @@ def fade_to_state_rgb(pixels, index, new_state, steps=25, reverse=False):
         yield
 
 def fade_to_color_rgb(pixels, index, color=(0, 0, 0),
-        steps=25, reverse=False):
+                      steps=25, reverse=False):
     active_pixels = len(index)
     new_state = []
     for i in range(active_pixels):
@@ -124,7 +124,8 @@ def rotate_state(pixels, index, skip=1, steps=25, reverse=False):
             print('rotate state, iter = {0:3d}'.format(step))
         yield
 
-def rainbow_cycle_II(pixels, index, attribute=(256, 256,1), steps=25, reverse=False):
+def rainbow_cycle(pixels, index, attribute=(256, 256,1),
+                  steps=25, reverse=False):
     " light up the full block of pixels and then cycle the colours around"
     full_wheel = attribute[0]
     arc_span   = attribute[1]
@@ -168,6 +169,31 @@ def make_colour_state(index, colour):
     '''Cheat a bit here : we're making an array of whatever we got
     passed, so an int can be treated the same as a tuple'''
     return make_colour_state_rgb(index, colour)
+
+def light_up_successive_rgb(pixels, index, new_state,
+                            steps=25, reverse=False):
+    ''' Takes an index of pixels, and a new 'state' to set those pixels to.
+    Uses the 'pixel_by_step' function to calculate how many pixels (clusters)
+    to set at each step, or how many steps to stay on the same pixel if
+    steps outnumber pixels.
+    Then sets the corresponding number of pixels for the step and yields.'''
+    active_pixels = len(index)
+    if active_pixels != len(new_state):
+        print("Error in fade_to_state_rgb : Length of states not consistent")
+        return
+    clusters = pixels_by_step(actice_pixels, steps)
+    if reverse:
+        clusters.reverse()
+    pixel_no = 0
+    for cluster in clusters:
+        for i in cluster:
+            pixel_colour = Adafruit_WS2801.RGB_to_color(
+                    new_state[pixel_no][0], new_state[pixel_no][1],
+                    new_state[pixel_no][2])
+            pixels.set_pixel(index[i], pixel_colour)
+            pixel_no += 1
+        pixels.show()
+        yield
 
 class Pixel_Section:
     """Don't use this object - it's deprecated and the code here is
@@ -251,18 +277,20 @@ class Pixel_Section:
                 time.sleep(0.05)
             yield
 
-def pixels_by_step(count,steps):
+def pixels_by_step(pixel_count, steps):
     ''' Takes the number of steps a pattern is going to be displayed for
-        and calculates the number of pixels that need to be adjusted each
-        step, or how many steps to stick with the same pixel.'''
+    and the number of pixels present. Then it calculates the number of
+    pixels that need to be adjusted each step, or how many steps to stick
+    with the same pixel.'''
     # create a list of 'steps' length that is as evenly spaced throughout
-    # the number of poxels provided.
-    fred=[int(float(count * x)/steps) for x in range(steps)]
-    # add an extra final element as we want 'steps' transiitons between 2 points
-    fred.append(count)
-    #print (fred)
+    # the number of pixels provided.
+    fred=[int(float(pixel_count * x)/steps) for x in range(steps)]
+    # add an extra final element as we want 'steps' transiitons between
+    # 2 points
+    fred.append(pixel_count)
+    print ("fred is : {0:}".format(fred))
     list_out=[]
-    # loop over the transitions calculation which pixels are 'between' them
+    # loop over the transitions calculating which pixels are 'between' them
     for i in range(len(fred)-1):
         if fred[i] == fred[i+1]:
             # No pixels between the end points, just set first pixel
@@ -276,12 +304,12 @@ def pixels_by_step(count,steps):
 
 def get_wheel_position(pixel_length, loop_index, steps_total,
                        laps=1, full_wheel=256, arc_span=256, reverse=False):
-    # We use each pixel as a fraction of the color wheel.
-    # The full wheel has "full_wheel_ colours in it.
-    # The arc_span is the length of the arc on that wheel represented by the
-    # pixels we have to hand.
-
-    # Find the position of the first pixel in the arc.
+    '''We use each pixel as a fraction of the color wheel.
+    The full wheel has "full_wheel colours in it.
+    The arc_span is the length of the arc on that wheel represented by the
+    pixels we have to hand.
+    So if arc_span = full_wheel then the pixels will have all the colours
+    Find the position of the first pixel in the arc.'''
     start_pos = int((loop_index / float(steps_total)) * laps * full_wheel)
     # Calculate the location of each pixel along the arc
     # the % full_wheel ensures the wheel loops back to the begining.
