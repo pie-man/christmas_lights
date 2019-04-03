@@ -3,7 +3,7 @@
 import time
 from datetime import datetime
 import pixel_strings_fncs as q
-from random import randint
+from random import randint, choice
 
 # Configure the count of pixels:
 PIXEL_COUNT = 50
@@ -125,6 +125,26 @@ def set_rainbow_ring_successive(index):
     actor = (q.light_up_successive_rgb, index, state, False)
     return (actor)
 
+def set_random_ring_successive(index):
+    '''Set an index to display a set colour by successively
+    illuminating sections of the ring.'''
+    debug_print("enetered set_random_ring_successive")
+    colour = q.get_random_colour_rgb()
+    state = q.make_colour_state(index, colour)
+    direction = choice([True, False])
+    actor = (q.light_up_successive_rgb, index, state, direction)
+    return (actor)
+
+def set_ring_dark_successive(index):
+    '''Set an index to display a set colour by successively
+    illuminating sections of the ring.'''
+    debug_print("enetered set_ring_dark_successive")
+    colour = (0, 0, 0)
+    state = q.make_colour_state(index, colour)
+    direction = choice([True, False])
+    actor = (q.light_up_successive_rgb, index, state, direction)
+    return (actor)
+
 def set_successive_rainbows():
     '''Set the three rings of the tree to display a rainbow
     pattern by successively illuminating sections of the rings.'''
@@ -144,6 +164,8 @@ def set_right_random_wibblefest():
             set_random_colour_ring,
             set_ring_to_cycling_rainbow,
             set_rainbow_ring_successive,
+            set_random_ring_successive,
+            set_ring_dark_successive,
             ]
     selection = randint(0, len(list_of_functions)-1 )
     top_actor    = list_of_functions[selection](TOP)
@@ -174,6 +196,15 @@ if __name__ == '__main__':
             set_right_random_wibblefest,
             set_right_random_wibblefest,
             set_right_random_wibblefest,
+            set_right_random_wibblefest,
+            set_right_random_wibblefest,
+            set_right_random_wibblefest,
+            set_right_random_wibblefest,
+            set_to_dim,
+            set_right_random_wibblefest,
+            set_to_dim,
+            set_right_random_wibblefest,
+            set_to_dim,
             set_rainbows,
             cycling_rainbows,
             set_to_dim,
