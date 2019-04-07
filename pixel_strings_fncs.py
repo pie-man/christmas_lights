@@ -210,34 +210,34 @@ def appear_from_end_rgb(pixels, index, color=(255, 0, 0), steps=25,
                         reverse=False):
     '''Chases a 'pixel' from one end, to the other, where it remains
     illuminated. Thus as as each 'chase' ends one more pixel is permemanly
-    illuminated until the entire string is illuminated'''
-    ''' The hard part here is going to be how to work out how to complete
+    illuminated until the entire string is illuminated.
+    The hard part here is going to be how to work out how to complete
     this in a set number of steps as it naturally has n(n+1)/2 steps where
     n is no. of pixels'''
-   pos = 0
-   jump = 1
-   start = 0
-   end = len(index) -1
-   order = range(start,end,jump)
-   if reverse:
-       order.reverse()
-       jump =-1
-       start = len(index) -1
-       end = 0
-   for i in order:
-       old_j = end
-       for j in (range(end, i-jump, 0 - jump)):
-           pixels.set_pixel(index[old_j],
-                  Adafruit_WS2801.RGB_to_color( 0,0,0 ))
-           # set then the pixel at position j
-           pixels.set_pixel(index[j],
-                   Adafruit_WS2801.RGB_to_color( color[0], color[1],
-                                                 color[2] ))
-           pixels.show()
-           #print(j, old_j)
-           old_j = j
-           time.sleep(0.02)
-       yield
+    pos = 0
+    jump = 1
+    start = 0
+    end = len(index) -1
+    order = range(start,end,jump)
+    if reverse:
+        order.reverse()
+        jump =-1
+        start = len(index) -1
+        end = 0
+    for i in order:
+        old_j = end
+        for j in (range(end, i-jump, 0 - jump)):
+            pixels.set_pixel(index[old_j],
+                   Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+            # set then the pixel at position j
+            pixels.set_pixel(index[j],
+                    Adafruit_WS2801.RGB_to_color( color[0], color[1],
+                                                  color[2] ))
+            pixels.show()
+            #print(j, old_j)
+            old_j = j
+            time.sleep(0.02)
+        yield
 
 def pixels_by_step(pixel_count, steps):
     ''' Takes the number of steps a pattern is going to be displayed for
