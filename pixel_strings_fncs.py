@@ -184,100 +184,60 @@ def light_up_successive_rgb(pixels, index, new_state,
     clusters = pixels_by_step(active_pixels, steps)
     if reverse:
         clusters.reverse()
-    pixel_no = 0
-    cluster_no = 0
     for cluster in clusters:
         for i in cluster:
             pixel_colour = Adafruit_WS2801.RGB_to_color(
                     new_state[i][0], new_state[i][1],
                     new_state[i][2])
             pixels.set_pixel(index[i], pixel_colour)
-            pixel_no += 1
-        #pixels.show()
-        cluster_no += 1
         yield
 
-class Pixel_Section:
-    """Don't use this object - it's deprecated and the code here is
-       just waiting to be moved out into the new 'iterator' format"""
-    def __init__(self, leds, offset, length, step=1):
-        max_pixels=leds.count()
-        if offset > max_pixels:
-            print("Eror: offset too far")
-            offset=0
-        string_end = min(max_pixels, offset + (length * step))
-        self.offset = offset
-        self.pixels = leds
-        self.index = [x for x in range(offset,string_end,step)]
-        self.length = len(self.index)
+def go_out_successive_rgb(pixels, index, not_used, steps=25, reverse=False):
+    '''Turns the pixels 'off' in clusters such that there are the same
+    number of clusters as there are steps.'''
+    state = make_colour_state_rgb(index, (0,0,0))
+    return self.light_up_successive(pixels, index, state,
+                                    steps, reverse)
 
-    def rainbow_cycle_successive(self, steps=10, 
-                         full_wheel=256, arc_span=256,
-                         laps=1, reverse=False):
-        clusters = pixels_by_step(self.length, steps)
-        if reverse:
-            clusters.reverse()
-        count = 0
-        pixel_locations = get_wheel_position(self.length, count, steps,
-                       laps=laps, full_wheel=full_wheel, arc_span=arc_span,
-                       reverse=reverse)
-        for cluster in clusters:
-            for i in cluster:
-                #pixel_no=i+self.offset
-                location = pixel_locations[i]
-                colour = wheel(location, spread=full_wheel)
-                #print("pixel no. = {0:3d} position {1:3d}".
-                #               format(self.index[i], location))
-                self.pixels.set_pixel(self.index[i], colour )
-            yield
-            count += 1
- 
-    def light_up_successive(self, steps=10, colour=(127,127,127), reverse=False):
-        clusters = pixels_by_step(self.length, steps)
-        if reverse:
-            clusters.reverse()
-        for cluster in clusters:
-            for i in cluster:
-                pixel_colour = Adafruit_WS2801.RGB_to_color(colour[0],
-                                                          colour[1],colour[2])
-                pixels.set_pixel(self.index[i], pixel_colour)
-                pixels.show()
-            yield
+def go_dim_successive_rgb(pixels, index, not_used, steps=25, reverse=False):
+    '''Turns the pixels 'dark' in clusters such that there are the same
+    number of clusters as there are steps.'''
+    state = make_colour_state_rgb(index, (1,1,1))
+    return self.light_up_successive(pixels, index, state,
+                                    steps, reverse)
 
-    def go_out_successive(self, steps=10, reverse=False):
-        return self.light_up_successive(steps, (0,0,0), reverse)
-
-    def appear_from_end(self, color=(255, 0, 0), reverse=False):
-        pos = 0
-        jump = 1
-        start = 0
-        end = self.length -1
-        order = range(start,end,jump)
-        if reverse:
-            order.reverse()
-            jump =-1
-            start = self.length -1
-            end = 0
-        for i in order:
-            old_j = end
-            for j in (range(end, i-jump, 0 - jump)):
-                #pixels.clear()
-                # first set all pixels at the begin
-                #for k in range(start, i, jump):
-                #    pixels.set_pixel(self.index[k],
-                #        Adafruit_WS2801.RGB_to_color( color[0], color[1],
-                #                                      color[2] ))
-                pixels.set_pixel(self.index[old_j],
-                       Adafruit_WS2801.RGB_to_color( 0,0,0 ))
-                # set then the pixel at position j
-                pixels.set_pixel(self.index[j],
-                        Adafruit_WS2801.RGB_to_color( color[0], color[1],
-                                                      color[2] ))
-                pixels.show()
-                #print(j, old_j)
-                old_j = j
-                time.sleep(0.05)
-            yield
+def appear_from_end_rgb(pixels, index, color=(255, 0, 0), steps=25,
+                        reverse=False):
+    '''Chases a 'pixel' from one end, to the other, where it remains
+    illuminated. Thus as as each 'chase' ends one more pixel is permemanly
+    illuminated until the entire string is illuminated'''
+    ''' The hard part here is going to be how to work out how to complete
+    this in a set number of steps as it naturally has n(n+1)/2 steps where
+    n is no. of pixels'''
+   pos = 0
+   jump = 1
+   start = 0
+   end = len(index) -1
+   order = range(start,end,jump)
+   if reverse:
+       order.reverse()
+       jump =-1
+       start = len(index) -1
+       end = 0
+   for i in order:
+       old_j = end
+       for j in (range(end, i-jump, 0 - jump)):
+           pixels.set_pixel(index[old_j],
+                  Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+           # set then the pixel at position j
+           pixels.set_pixel(index[j],
+                   Adafruit_WS2801.RGB_to_color( color[0], color[1],
+                                                 color[2] ))
+           pixels.show()
+           #print(j, old_j)
+           old_j = j
+           time.sleep(0.02)
+       yield
 
 def pixels_by_step(pixel_count, steps):
     ''' Takes the number of steps a pattern is going to be displayed for

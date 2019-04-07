@@ -145,6 +145,10 @@ def set_ring_dark_successive(index):
     actor = (q.light_up_successive_rgb, index, state, direction)
     return (actor)
 
+def set_ring_colour_chase():
+    '''assign a colour to every Nth pixel (where N=no. of colours provided)
+    and then step all the pixels one direction or the othert'''
+
 def set_successive_rainbows():
     '''Set the three rings of the tree to display a rainbow
     pattern by successively illuminating sections of the rings.'''
@@ -217,29 +221,36 @@ if __name__ == '__main__':
         if count >= len(function_list):
             count=0
         function = function_list[count]
-        (top_actor, middle_actor, bottom_actor) = function()
+        actors = function()
+        #(top_actor, middle_actor, bottom_actor) = function()
         stepcount = 180
         cluster = q.bundle(pixels, wait=0.2, steps=stepcount)
-        cluster.add_function(top_actor[0], top_actor[1], attribute=top_actor[2],
-                             reverse=top_actor[3])
-        cluster.add_function(middle_actor[0], middle_actor[1],
-                             attribute=middle_actor[2],
-                             reverse=middle_actor[3])
-        cluster.add_function(bottom_actor[0], bottom_actor[1],
-                             attribute=bottom_actor[2],
-                             reverse=bottom_actor[3])
+        for actor in actors:
+            cluster.add_function(actor[0], actor[1],
+                                 attribute=actor[2],
+                                 reverse=actor[3])
+        #cluster.add_function(middle_actor[0], middle_actor[1],
+        #                     attribute=middle_actor[2],
+        #                     reverse=middle_actor[3])
+        #cluster.add_function(bottom_actor[0], bottom_actor[1],
+        #                     attribute=bottom_actor[2],
+        #                     reverse=bottom_actor[3])
         #print("Running a function... at {0}".format(datetime.now()))
         cluster.run_bundle()
 
     # Shut it all down quietly...
     #print("closing down... at {0}".format(datetime.now()))
-    (top_actor, middle_actor, bottom_actor) = set_to_black()
+    #(top_actor, middle_actor, bottom_actor) = set_to_black()
+    actors = set_to_black()
     stepcount = 120
     cluster = q.bundle(pixels, wait=0.5, steps=stepcount)
-    cluster.add_function(top_actor[0], top_actor[1],
-                         attribute=top_actor[2], reverse=top_actor[3])
-    cluster.add_function(middle_actor[0], middle_actor[1],
-                         attribute=middle_actor[2], reverse=middle_actor[3])
-    cluster.add_function(bottom_actor[0], bottom_actor[1],
-                         attribute=bottom_actor[2], reverse=bottom_actor[3])
+    for actor in actors:
+        cluster.add_function(actor[0], actor[1],
+                             attribute=actor[2], reverse=actor[3])
+    #cluster.add_function(top_actor[0], top_actor[1],
+    #                     attribute=top_actor[2], reverse=top_actor[3])
+    #cluster.add_function(middle_actor[0], middle_actor[1],
+    #                     attribute=middle_actor[2], reverse=middle_actor[3])
+    #cluster.add_function(bottom_actor[0], bottom_actor[1],
+    #                     attribute=bottom_actor[2], reverse=bottom_actor[3])
     cluster.run_bundle()
