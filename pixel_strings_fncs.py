@@ -12,6 +12,13 @@ import Adafruit_GPIO.SPI as SPI
 PIXEL_COUNT = 50
 DEBUG=False
 
+# Define some set colours by name
+RED    = (200,   0,   0)
+YELLOW = (127, 127,   0)
+GREEN  = (  0, 200,   0)
+BLUE   = (  0,   0, 200)
+PURPLE = (127,   0, 127)
+
 def initialise_pixels(pixel_count):
     # Alternatively specify a hardware SPI connection on /dev/spidev0.0:
     SPI_PORT   = 0
@@ -36,6 +43,34 @@ def create_index(pixels, index_start, index_end, step=1, reverse=False):
     if reverse:
         index.reverse()
     return index
+
+def make_colour_state_rgb(index, rgb_colour):
+    active_pixels = len(index)
+    colour_state = []
+    for i in range(active_pixels):
+        colour_state.append(rgb_colour)
+    return colour_state
+
+def make_colour_state(index, colour):
+    '''Cheat a bit here : we're making an array of whatever we got
+    passed, so an int can be treated the same as a tuple'''
+    return make_colour_state_rgb(index, colour)
+
+def make_rainbow_state_rgb(index):
+    active_pixels = len(index)
+    rainbow_state = []
+    for i in range(active_pixels):
+        colour = wheel_rgb(i, spread=active_pixels+1)
+        rainbow_state.append(colour)
+    return rainbow_state
+
+def make_rainbow_state(index):
+    active_pixels = len(index)
+    rainbow_state = []
+    for i in range(active_pixels):
+        colour = wheel(i, spread=active_pixels+1)
+        rainbow_state.append(colour)
+    return rainbow_state
 
 def get_state(pixels, index):
     active_pixels = len(index)
@@ -120,8 +155,6 @@ def rotate_state(pixels, index, skip=1, steps=25, reverse=False):
         for i in range(active_pixels):
             pixels.set_pixel(index[i], new_state[i] )
         current_state = new_state
-        if DEBUG:
-            print('rotate state, iter = {0:3d}'.format(step))
         yield
 
 def rainbow_cycle(pixels, index, attribute=(256, 256,1),
@@ -141,34 +174,6 @@ def rainbow_cycle(pixels, index, attribute=(256, 256,1),
             colour = wheel(pixel_positions[i], spread=full_wheel)
             pixels.set_pixel(index[i], colour )
         yield # Return 'control' to main program somewhere
-
-def make_rainbow_state_rgb(index):
-    active_pixels = len(index)
-    rainbow_state = []
-    for i in range(active_pixels):
-        colour = wheel_rgb(i, spread=active_pixels+1)
-        rainbow_state.append(colour)
-    return rainbow_state
-
-def make_rainbow_state(index):
-    active_pixels = len(index)
-    rainbow_state = []
-    for i in range(active_pixels):
-        colour = wheel(i, spread=active_pixels+1)
-        rainbow_state.append(colour)
-    return rainbow_state
-
-def make_colour_state_rgb(index, rgb_colour):
-    active_pixels = len(index)
-    colour_state = []
-    for i in range(active_pixels):
-        colour_state.append(rgb_colour)
-    return colour_state
-
-def make_colour_state(index, colour):
-    '''Cheat a bit here : we're making an array of whatever we got
-    passed, so an int can be treated the same as a tuple'''
-    return make_colour_state_rgb(index, colour)
 
 def light_up_successive_rgb(pixels, index, new_state,
                             steps=25, reverse=False):
@@ -376,12 +381,6 @@ class bundle:
 
 if __name__ == "__main__":
     pixels = initialise_pixels(PIXEL_COUNT)
-
-    red    = (200,   0,   0)
-    yellow = (127, 127,   0)
-    green  = (  0, 200,   0)
-    blue   = (  0,   0, 200)
-    purple = (127,   0, 127)
 
     # Set up some basic 'shapes' to play with lights in
     whole_window = create_index(pixels, 0, 50, step=1)

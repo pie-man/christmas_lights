@@ -3,9 +3,10 @@
 pixels on the Christmas tree at work'''
 
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 import pixel_strings_fncs as q
 import random
+import argparse
 
 # Configure the total number of pixels available:
 PIXEL_COUNT = 50
@@ -114,7 +115,8 @@ def set_to_cycling_rainbow(pixel_index):
     debug_print(1, "enetered set_to_cycling_rainbow ")
     # laps is the number of times the sequence cylces round fully
     laps = random.choice([2,4,6,8])
-    actor    = (q.rainbow_cycle, pixel_index, (256, 256, laps), False)
+    direction = random.choice([True, False])
+    actor    = (q.rainbow_cycle, pixel_index, (256, 256, laps), direction)
     return (actor)
 
 def set_cycling_rainbow_blocks(collections):
@@ -169,6 +171,26 @@ def set_successive_rainbow_blocks(collections):
         actors.append(set_rainbow_pattern_successive(collection))
     return (actors)
 
+def set_successive_random_colour_blocks(collections):
+    '''Set all the groups of pixels in each collection to display
+    a randomly selected colour by successively illuminating sections
+    of the groups.'''
+    debug_print(1, "enetered set_successive_random_colour_blocks(): ")
+    actors = []
+    for collection in collections:
+        actors.append(set_random_colour_successive(collection))
+    return (actors)
+
+def set_go_out_successive_blocks(collections):
+    '''Set all the groups of pixels in each collection to display
+    a rainbow pattern by successively illuminating sections of the
+    groups.'''
+    debug_print(1, "enetered set_go_out_successive_blocks(): ")
+    actors = []
+    for collection in collections:
+        actors.append(set_go_out_successive(collection))
+    return (actors)
+
 def set_right_random_wibblefest(collections):
     '''Randomly select and assign a function for each collection of pixels'''
     debug_print(1, "enetered set_right_random_wibblefest(): ")
@@ -195,7 +217,22 @@ def debug_print(threshold, text):
     if print_level >= threshold:
         print(text)
 
+def handle_cmd_args():
+    parser = argparse.ArgumentParser(description='Process some arguments.')
+    parser.add_argument('--start', dest='starttime', 
+                        default=datetime.strftime(datetime.now(), "%H:%M"))
+    parser.add_argument('--end', dest='endtime', 
+                        default=datetime.strftime(datetime.now()+
+                            timedelta(hours=4), "%H:%M"))
+
+    args = parser.parse_args()
+    print ("my args are...{0:}".format(args))
+    print ("my starttime is...{0:s}".format(args.starttime))
+    print ("my endtime is...{0:s}".format(args.endtime))
+    return args
+
 if __name__ == '__main__':
+
     pixels = q.initialise_pixels(PIXEL_COUNT)
     function_list = [
             set_random_colour_blocks,
@@ -208,12 +245,14 @@ if __name__ == '__main__':
             set_random_colour_blocks,
             set_blocks_to_dim,
             set_successive_rainbow_blocks,
+            set_go_out_successive_blocks,
             set_right_random_wibblefest,
             set_right_random_wibblefest,
             set_right_random_wibblefest,
             set_right_random_wibblefest,
             set_right_random_wibblefest,
             set_right_random_wibblefest,
+            set_successive_random_colour_blocks,
             set_right_random_wibblefest,
             set_blocks_to_dim,
             set_right_random_wibblefest,
@@ -235,9 +274,25 @@ if __name__ == '__main__':
             set_cycling_rainbow_blocks,
             ]
 
+    args = handle_cmd_args()
+
+    # some abysmal time mangling to turn "%H:%M" formatted time into a time today
+    # Please let there be a better way to do this....
+    starttime = datetime.strptime(args.starttime, "%H:%M")
+    endtime = datetime.strptime(args.endtime, "%H:%M")
+    todays_year = datetime.now().year
+    todays_month = datetime.now().month
+    todays_day = datetime.now().day
+    starttime = starttime.replace(todays_year, todays_month, todays_day)
+    endtime = endtime.replace(todays_year, todays_month, todays_day)
+
+    #Wait to start ?
+    while starttime >= datetime.now():
+        debug_print(1, "having a nap... at {0}".format(datetime.now()))
+        time.sleep(300)
     count=len(function_list)-1
     #for function in function_list:
-    while datetime.now().hour > 12:
+    while endtime > datetime.now():
         count=count+1
         if count >= len(function_list):
             count=0
