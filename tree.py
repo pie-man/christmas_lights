@@ -20,8 +20,6 @@ MIDDLE = range(7, 24)
 BOTTOM = range(7)
 ALL = [TOP, MIDDLE, BOTTOM]
 
-print_level=1
-
 def set_fade_to_rainbow(pixel_index):
     '''Set the pixels refered to by pixel_index to fade to
        a full rainbow spread around the 'colour wheel'.'''
@@ -224,7 +222,8 @@ def handle_cmd_args():
     parser.add_argument('--end', dest='endtime', 
                         default=datetime.strftime(datetime.now()+
                             timedelta(hours=4), "%H:%M"))
-
+    parser.add_argument("-v", "--verbosity", action="count", default=0,
+                        help="increase output verbosity")
     args = parser.parse_args()
     print ("my args are...{0:}".format(args))
     print ("my starttime is...{0:s}".format(args.starttime))
@@ -263,16 +262,6 @@ if __name__ == '__main__':
             set_cycling_rainbow_blocks,
             set_blocks_to_dim,
             ]
-    function_list = [
-            set_R_G_or_B_blocks,
-            set_rainbows_fade,
-            set_random_colour_blocks,
-            set_right_random_wibblefest,
-            set_blocks_to_dim,
-            set_successive_rainbow_blocks,
-            set_blocks_to_black,
-            set_cycling_rainbow_blocks,
-            ]
 
     args = handle_cmd_args()
 
@@ -285,6 +274,10 @@ if __name__ == '__main__':
     todays_day = datetime.now().day
     starttime = starttime.replace(todays_year, todays_month, todays_day)
     endtime = endtime.replace(todays_year, todays_month, todays_day)
+    if endtime < starttime:
+        endtime = endtime + timedelta(days=1)
+
+    print_level=args.verbosity
 
     #Wait to start ?
     while starttime >= datetime.now():
@@ -308,7 +301,7 @@ if __name__ == '__main__':
 
     # Shut it all down quietly...
     debug_print(1, "closing down... at {0}".format(datetime.now()))
-    actors = set_blocks_to_black()
+    actors = set_blocks_to_black(ALL)
     stepcount = 120
     cluster = q.bundle(pixels, wait=0.5, steps=stepcount)
     for actor in actors:

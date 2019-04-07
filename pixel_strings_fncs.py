@@ -18,6 +18,7 @@ YELLOW = (127, 127,   0)
 GREEN  = (  0, 200,   0)
 BLUE   = (  0,   0, 200)
 PURPLE = (127,   0, 127)
+ORANGE = (195,  60,   0)
 
 def initialise_pixels(pixel_count):
     # Alternatively specify a hardware SPI connection on /dev/spidev0.0:
