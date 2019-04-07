@@ -1,205 +1,213 @@
 #!/usr/bin/env python
-# Simple demo of of the WS2801/SPI-like addressable RGB LED lights.
+'''Program to set and step through ligths sequences on 3 rings of WS2801
+pixels on the Christmas tree at work'''
+
 import time
 from datetime import datetime
 import pixel_strings_fncs as q
-from random import randint, choice
+import random
 
-# Configure the count of pixels:
+# Configure the total number of pixels available:
 PIXEL_COUNT = 50
 
 # Logical to enable/disable flashing or rapidly changing sequences.
 FLASHING=True
 
-# Define the 'index' of the three rings of pixels to be ued globally
+# Define the 'pixel_index' of the three sets of pixels to be used globally
 TOP    = range(25, 50)
 MIDDLE = range(7, 24)
 BOTTOM = range(7)
 ALL = [TOP, MIDDLE, BOTTOM]
 
 print_level=1
-threshold=1
 
-def set_fade_to_rainbow(index):
-    '''Set the lights  refered to by index to
-       a full rainbow spread'''
-    debug_print("enetered set_fade_to_rainbow")
-    state = q.make_rainbow_state_rgb(index)
-    actor = (q.fade_to_state_rgb, index, state, False)
+def set_fade_to_rainbow(pixel_index):
+    '''Set the pixels refered to by pixel_index to fade to
+       a full rainbow spread around the 'colour wheel'.'''
+    debug_print(1, "enetered set_fade_to_rainbow")
+    state = q.make_rainbow_state_rgb(pixel_index)
+    actor = (q.fade_to_state_rgb, pixel_index, state, False)
     return actor
 
 def set_rainbows_fade(collections):
-    '''Set the three rings of the tree to display a static
-       loop of rainbow colours'''
-
-    debug_print("enetered set_rainbows_fade")
+    '''Set all the groups of pixels in each collection to fade to
+       a full rainbow spread around the 'colour wheel'.'''
+    debug_print(1, "enetered set_rainbows_fade")
     actors = []
     for collection in collections:
         actors.append(set_fade_to_rainbow(collection))
     return (actors)
 
-def set_r_g_or_b_ring(index):
-    '''Randomly set an index to one of red, green or blue'''
-    debug_print("enetered set_r_g_or_b_ring")
+def set_fade_to_R_G_or_B(pixel_index):
+    '''Set the pixels refered to by pixel_index to fade to
+    one of red, green or blue selected randomly'''
+    debug_print(1, "enetered set_fade_to_R_G_or_B")
     colours = [(200, 0, 0), (0, 200, 0), (0, 0, 200)]
-    state = q.make_colour_state(index, colours[randint(0,len(colours)-1)])
-    actor = (q.fade_to_state_rgb, index, state, False)
+    state = q.make_colour_state(pixel_index,
+            colours[random.randint(0,len(colours)-1)])
+    actor = (q.fade_to_state_rgb, pixel_index, state, False)
     return (actor)
 
-def set_r_g_and_b_rings(collections):
-    '''Set the three rings of the tree to display static
-       rings of red, green or blue'''
-    debug_print("enetered set_r_g_and_b_rings")
+def set_R_G_or_B_blocks(collections):
+    '''Set all the groups of pixels in each collection to fade to
+    one of red, green or blue selected randomly'''
+    debug_print(1, "enetered set_R_G_or_B_blocks")
     actors = []
     for collection in collections:
-        actors.append(set_r_g_or_b_ring(collection))
+        actors.append(set_fade_to_R_G_or_B(collection))
     return (actors)
 
-def set_random_colour_ring(index):
-    '''Set an index to a random colour'''
-    debug_print("enetered set_random_colour_ring ")
-    state = q.make_colour_state(index, q.get_random_colour_rgb())
-    actor = (q.fade_to_state_rgb, index, state, False)
+def set_fade_to_rand_colour(pixel_index):
+    '''Set the pixels refered to by pixel_index to fade to
+    a random colour'''
+    debug_print(1, "enetered set_fade_to_rand_colour ")
+    state = q.make_colour_state(pixel_index, q.get_random_colour_rgb())
+    actor = (q.fade_to_state_rgb, pixel_index, state, False)
     return (actor)
 
-def set_random_rings(collections):
-    '''Set the three rings of the tree to display static
-       rings of random colours'''
-    debug_print("enetered set_random_rings")
+def set_random_colour_blocks(collections):
+    '''Set all the groups of pixels in each collection to fade to
+       a randomly selected colour.
+       Selecting separate colours for each block'''
+    debug_print(1, "enetered set_random_colour_blocks")
     actors = []
     for collection in collections:
-        actors.append(set_random_colour_ring(collection))
+        actors.append(set_fade_to_rand_colour(collection))
     return (actors)
 
-def set_ring_to_black(index):
-    '''Set an index to the go black'''
-    debug_print("enetered set_ring_to_black ")
+def set_fade_to_black(pixel_index):
+    '''Set the pixels refered to by pixel_index to fade
+    out completely'''
+    debug_print(1, "enetered set_fade_to_black ")
     dummy = "not required"
-    actor = (q.fade_to_black, index, dummy, False)
+    actor = (q.fade_to_black, pixel_index, dummy, False)
     return (actor)
 
-def set_to_black(collections):
-    '''fade all three rings to black'''
-    debug_print("enetered set_to_black(): ")
+def set_blocks_to_black(collections):
+    '''Set all the groups of pixels in each collection to fade to
+    out completely'''
+    debug_print(1, "enetered set_blocks_to_black(): ")
     actors = []
     for collection in collections:
-        actors.append(set_ring_to_black(collection))
+        actors.append(set_fade_to_black(collection))
     return (actors)
 
-def set_ring_to_dim(index):
-    '''Set an index to the go almost black'''
-    debug_print("enetered set_ring_to_dim ")
-    actor    = (q.fade_to_color_rgb, index, (1,1,1), False)
+def set_fade_to_dim(pixel_index):
+    '''Set the pixels refered to by pixel_index to fade
+    to almost black'''
+    debug_print(1, "enetered set_fade_to_dim ")
+    actor    = (q.fade_to_color_rgb, pixel_index, (1,1,1), False)
     return (actor)
 
-def set_to_dim(collections):
-    '''fade all three rings to black'''
-    debug_print("enetered set_to_dim():")
+def set_blocks_to_dim(collections):
+    '''Set all the groups of pixels in each collection to fade to
+    to almost black'''
+    debug_print(1, "enetered set_blocks_to_dim():")
     actors = []
     for collection in collections:
-        actors.append(set_ring_to_dim(collection))
+        actors.append(set_fade_to_dim(collection))
     return (actors)
 
-def set_ring_to_cycling_rainbow(index):
-    '''Set an index to display a rainbow
-       pattern and gently cycle it around the ring.
-       Please only run this AFTER a set_rainbow_ring function'''
-    debug_print("enetered set_ring_to_cycling_rainbow ")
-    laps = choice([2,4,6,8])
-    actor    = (q.rainbow_cycle, index, (256, 256, laps), False)
+def set_to_cycling_rainbow(pixel_index):
+    '''Set the pixels refered to by pixel_index to immediately display
+    a rainbow pattern and gently cycle it around the block of pixels.'''
+    debug_print(1, "enetered set_to_cycling_rainbow ")
+    # laps is the number of times the sequence cylces round fully
+    laps = random.choice([2,4,6,8])
+    actor    = (q.rainbow_cycle, pixel_index, (256, 256, laps), False)
     return (actor)
 
-def cycling_rainbows(collections):
-    '''Set the three rings of the tree to display a rainbow
-       pattern and gently cycle it around the ring.
-       Please only run this AFTER set_to_rainbows'''
-    debug_print("enetered cycling_rainbows(): ")
+def set_cycling_rainbow_blocks(collections):
+    '''Set all the groups of pixels in each collection to display a rainbow
+       pattern and gently cycle it around the group'''
+    debug_print(1, "enetered set_cycling_rainbow_blocks(): ")
     actors = []
     for collection in collections:
-        actors.append(set_ring_to_cycling_rainbow(collection))
+        actors.append(set_to_cycling_rainbow(collection))
     return (actors)
 
-def set_rainbow_ring_successive(index):
-    '''Set an index to display a rainbow pattern by successively
+def set_rainbow_pattern_successive(pixel_index):
+    '''Set the pixels refered to by pixel_index to display
+    a rainbow pattern by successively illuminating sections of the
+    group.'''
+    debug_print(1, "enetered set_rainbow_pattern_successive ")
+    state = q.make_rainbow_state_rgb(pixel_index)
+    actor = (q.light_up_successive_rgb, pixel_index, state, False)
+    return (actor)
+
+def set_random_colour_successive(pixel_index):
+    '''Set an pixel_index to display a set colour by successively
     illuminating sections of the ring.'''
-    debug_print("enetered set_rainbow_ring_successive ")
-    state = q.make_rainbow_state_rgb(index)
-    actor = (q.light_up_successive_rgb, index, state, False)
-    return (actor)
-
-def set_random_ring_successive(index):
-    '''Set an index to display a set colour by successively
-    illuminating sections of the ring.'''
-    debug_print("enetered set_random_ring_successive")
+    debug_print(1, "enetered set_random_colour_successive")
     colour = q.get_random_colour_rgb()
-    state = q.make_colour_state(index, colour)
-    direction = choice([True, False])
-    actor = (q.light_up_successive_rgb, index, state, direction)
+    state = q.make_colour_state(pixel_index, colour)
+    direction = random.choice([True, False])
+    actor = (q.light_up_successive_rgb, pixel_index, state, direction)
     return (actor)
 
-def set_ring_dark_successive(index):
-    '''Set an index to display a set colour by successively
-    illuminating sections of the ring.'''
-    debug_print("enetered set_ring_dark_successive")
+def set_go_out_successive(pixel_index):
+    '''Set the pixels refered to by pixel_index to go out
+    by successively de-illuminating sections of the block.'''
+    debug_print(1, "enetered set_go_out_successive")
     colour = (0, 0, 0)
-    state = q.make_colour_state(index, colour)
-    direction = choice([True, False])
-    actor = (q.light_up_successive_rgb, index, state, direction)
+    state = q.make_colour_state(pixel_index, colour)
+    direction = random.choice([True, False])
+    actor = (q.light_up_successive_rgb, pixel_index, state, direction)
     return (actor)
 
-def set_ring_colour_chase():
+def set_colour_chase():
     '''assign a colour to every Nth pixel (where N=no. of colours provided)
     and then step all the pixels one direction or the othert'''
 
-def set_successive_rainbows(collections):
-    '''Set the three rings of the tree to display a rainbow
-    pattern by successively illuminating sections of the rings.'''
-    debug_print("enetered set_successive_rainbows(): ")
+def set_successive_rainbow_blocks(collections):
+    '''Set all the groups of pixels in each collection to display
+    a rainbow pattern by successively illuminating sections of the
+    groups.'''
+    debug_print(1, "enetered set_successive_rainbow_blocks(): ")
     actors = []
     for collection in collections:
-        actors.append(set_rainbow_ring_successive(collection))
+        actors.append(set_rainbow_pattern_successive(collection))
     return (actors)
 
 def set_right_random_wibblefest(collections):
-    '''collections is a list of lists. Each of the lists is a set of
-    pixel indicies.
-    This routine selects funtions randomly from a list and assigns one to each
-    'collection' of pixels. '''
-    debug_print("enetered set_right_random_wibblefest(): ")
+    '''Randomly select and assign a function for each collection of pixels'''
+    debug_print(1, "enetered set_right_random_wibblefest(): ")
     actors = []
     list_of_functions = [
             set_fade_to_rainbow,
-            set_r_g_or_b_ring,
-            set_ring_to_cycling_rainbow,
-            set_random_colour_ring,
-            set_ring_to_cycling_rainbow,
-            set_rainbow_ring_successive,
-            set_random_ring_successive,
-            set_ring_dark_successive,
+            set_fade_to_R_G_or_B,
+            set_to_cycling_rainbow,
+            set_fade_to_rand_colour,
+            set_to_cycling_rainbow,
+            set_rainbow_pattern_successive,
+            set_random_colour_successive,
+            set_go_out_successive,
             ]
     for collection in collections:
-        selection  = choice(list_of_functions)
+        selection  = random.choice(list_of_functions)
         actors.append(selection(collection))
     return (actors)
 
-def debug_print(text):
-    '''Check print level and print messages if threshold metdef '''
+def debug_print(threshold, text):
+    '''Check print level and print messages if threshold is met or exceeded.
+    Thus warning/debug messages with a higher threshold can be silenced for
+    more routine running and re-enabled if there's debugging to be done.'''
     if print_level >= threshold:
         print(text)
 
 if __name__ == '__main__':
     pixels = q.initialise_pixels(PIXEL_COUNT)
     function_list = [
-            set_random_rings,
-            set_r_g_and_b_rings,
+            set_random_colour_blocks,
+            set_R_G_or_B_blocks,
             set_rainbows_fade,
-            cycling_rainbows,
-            set_to_dim,
-            set_random_rings,
-            set_to_dim,
-            set_random_rings,
-            set_to_dim,
-            set_successive_rainbows,
+            set_cycling_rainbow_blocks,
+            set_blocks_to_dim,
+            set_random_colour_blocks,
+            set_blocks_to_dim,
+            set_random_colour_blocks,
+            set_blocks_to_dim,
+            set_successive_rainbow_blocks,
             set_right_random_wibblefest,
             set_right_random_wibblefest,
             set_right_random_wibblefest,
@@ -207,24 +215,24 @@ if __name__ == '__main__':
             set_right_random_wibblefest,
             set_right_random_wibblefest,
             set_right_random_wibblefest,
-            set_to_dim,
+            set_blocks_to_dim,
             set_right_random_wibblefest,
-            set_to_dim,
+            set_blocks_to_dim,
             set_right_random_wibblefest,
-            set_to_dim,
+            set_blocks_to_dim,
             set_rainbows_fade,
-            cycling_rainbows,
-            set_to_dim,
+            set_cycling_rainbow_blocks,
+            set_blocks_to_dim,
             ]
     function_list = [
-            set_r_g_and_b_rings,
+            set_R_G_or_B_blocks,
             set_rainbows_fade,
-            set_random_rings,
+            set_random_colour_blocks,
             set_right_random_wibblefest,
-            set_to_dim,
-            set_successive_rainbows,
-            set_to_black,
-            cycling_rainbows,
+            set_blocks_to_dim,
+            set_successive_rainbow_blocks,
+            set_blocks_to_black,
+            set_cycling_rainbow_blocks,
             ]
 
     count=len(function_list)-1
@@ -235,35 +243,20 @@ if __name__ == '__main__':
             count=0
         function = function_list[count]
         actors = function(ALL)
-        #(top_actor, middle_actor, bottom_actor) = function()
         stepcount = 180
         cluster = q.bundle(pixels, wait=0.2, steps=stepcount)
         for actor in actors:
             cluster.add_function(actor[0], actor[1],
                                  attribute=actor[2],
                                  reverse=actor[3])
-        #cluster.add_function(middle_actor[0], middle_actor[1],
-        #                     attribute=middle_actor[2],
-        #                     reverse=middle_actor[3])
-        #cluster.add_function(bottom_actor[0], bottom_actor[1],
-        #                     attribute=bottom_actor[2],
-        #                     reverse=bottom_actor[3])
-        #print("Running a function... at {0}".format(datetime.now()))
         cluster.run_bundle()
 
     # Shut it all down quietly...
-    #print("closing down... at {0}".format(datetime.now()))
-    #(top_actor, middle_actor, bottom_actor) = set_to_black()
-    actors = set_to_black()
+    debug_print(1, "closing down... at {0}".format(datetime.now()))
+    actors = set_blocks_to_black()
     stepcount = 120
     cluster = q.bundle(pixels, wait=0.5, steps=stepcount)
     for actor in actors:
         cluster.add_function(actor[0], actor[1],
                              attribute=actor[2], reverse=actor[3])
-    #cluster.add_function(top_actor[0], top_actor[1],
-    #                     attribute=top_actor[2], reverse=top_actor[3])
-    #cluster.add_function(middle_actor[0], middle_actor[1],
-    #                     attribute=middle_actor[2], reverse=middle_actor[3])
-    #cluster.add_function(bottom_actor[0], bottom_actor[1],
-    #                     attribute=bottom_actor[2], reverse=bottom_actor[3])
     cluster.run_bundle()
