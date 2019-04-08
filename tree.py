@@ -42,7 +42,7 @@ def set_fade_to_R_G_or_B(pixel_index):
     one of red, green or blue selected randomly'''
     debug_print(1, "enetered set_fade_to_R_G_or_B")
     colours = [(200, 0, 0), (0, 200, 0), (0, 0, 200)]
-    state = q.make_colour_state(pixel_index,
+    state = q.make_single_colour_state(pixel_index,
             colours[random.randint(0,len(colours)-1)])
     actor = (q.fade_to_state_rgb, pixel_index, state, False)
     return (actor)
@@ -60,18 +60,36 @@ def set_fade_to_rand_colour(pixel_index):
     '''Set the pixels refered to by pixel_index to fade to
     a random colour'''
     debug_print(1, "enetered set_fade_to_rand_colour ")
-    state = q.make_colour_state(pixel_index, q.get_random_colour_rgb())
+    state = q.make_single_colour_state(pixel_index, q.get_random_colour_rgb())
     actor = (q.fade_to_state_rgb, pixel_index, state, False)
     return (actor)
 
-def set_random_colour_blocks(collections):
+def set_blocks_to_fade_to_rand_colours(collections):
     '''Set all the groups of pixels in each collection to fade to
        a randomly selected colour.
        Selecting separate colours for each block'''
-    debug_print(1, "enetered set_random_colour_blocks")
+    debug_print(1, "enetered set_blocks_to_fade_to_rand_colours")
     actors = []
     for collection in collections:
         actors.append(set_fade_to_rand_colour(collection))
+    return (actors)
+
+def set_fade_to_colour_array(pixel_index):
+    '''Set the pixels refered to by pixel_index to fade to
+    a predefined set of clours'''
+    debug_print(1, "enetered set_fade_to_colour_array ")
+    state = q.make_multi_colour_state_rgb(pixel_index, None)
+    actor = (q.fade_to_state_rgb, pixel_index, state, False)
+    return (actor)
+
+def set_blocks_to_fade_to_colour_arrays(collections):
+    '''Set all the groups of pixels in each collection to fade to
+       a predefined set of clours.
+       Selecting separate colours for each block'''
+    debug_print(1, "enetered set_blocks_to_fade_to_colour_arrays")
+    actors = []
+    for collection in collections:
+        actors.append(set_fade_to_colour_array(collection))
     return (actors)
 
 def set_fade_to_black(pixel_index):
@@ -82,10 +100,10 @@ def set_fade_to_black(pixel_index):
     actor = (q.fade_to_black, pixel_index, dummy, False)
     return (actor)
 
-def set_blocks_to_black(collections):
+def set_blocks_to_fade_black(collections):
     '''Set all the groups of pixels in each collection to fade to
     out completely'''
-    debug_print(1, "enetered set_blocks_to_black(): ")
+    debug_print(1, "enetered set_blocks_to_fade_black(): ")
     actors = []
     for collection in collections:
         actors.append(set_fade_to_black(collection))
@@ -98,10 +116,10 @@ def set_fade_to_dim(pixel_index):
     actor    = (q.fade_to_color_rgb, pixel_index, (1,1,1), False)
     return (actor)
 
-def set_blocks_to_dim(collections):
+def set_blocks_to_fade_to_dim(collections):
     '''Set all the groups of pixels in each collection to fade to
     to almost black'''
-    debug_print(1, "enetered set_blocks_to_dim():")
+    debug_print(1, "enetered set_blocks_to_fade_to_dim():")
     actors = []
     for collection in collections:
         actors.append(set_fade_to_dim(collection))
@@ -140,7 +158,7 @@ def set_random_colour_successive(pixel_index):
     illuminating sections of the ring.'''
     debug_print(1, "enetered set_random_colour_successive")
     colour = q.get_random_colour_rgb()
-    state = q.make_colour_state(pixel_index, colour)
+    state = q.make_single_colour_state(pixel_index, colour)
     direction = random.choice([True, False])
     actor = (q.light_up_successive_rgb, pixel_index, state, direction)
     return (actor)
@@ -150,9 +168,19 @@ def set_go_out_successive(pixel_index):
     by successively de-illuminating sections of the block.'''
     debug_print(1, "enetered set_go_out_successive")
     colour = (0, 0, 0)
-    state = q.make_colour_state(pixel_index, colour)
+    state = q.make_single_colour_state(pixel_index, colour)
     direction = random.choice([True, False])
     actor = (q.light_up_successive_rgb, pixel_index, state, direction)
+    return (actor)
+
+def set_rotate_state(pixel_index):
+    '''Set the pixels refered to by pixel_index to  shift
+    round one pixel at a time'''
+    debug_print(1, "enetered set_rotate_state")
+    colour = (0, 0, 0)
+    state = q.make_multi_colour_state_rgb(pixel_index, None)
+    direction = random.choice([True, False])
+    actor = (q.rotate_state, pixel_index, 1, direction)
     return (actor)
 
 def set_colour_chase():
@@ -187,6 +215,15 @@ def set_go_out_successive_blocks(collections):
     actors = []
     for collection in collections:
         actors.append(set_go_out_successive(collection))
+    return (actors)
+
+def set_rotate_block_states(collections):
+    '''Set all the groups of pixels in each collection to shift
+    round one pixel at a time'''
+    debug_print(1, "enetered set_rotate_block_states(): ")
+    actors = []
+    for collection in collections:
+        actors.append(set_rotate_state(collection))
     return (actors)
 
 def set_right_random_wibblefest(collections):
@@ -234,15 +271,18 @@ if __name__ == '__main__':
 
     pixels = q.initialise_pixels(PIXEL_COUNT)
     function_list = [
-            set_random_colour_blocks,
+            set_blocks_to_fade_to_rand_colours,
             set_R_G_or_B_blocks,
             set_rainbows_fade,
             set_cycling_rainbow_blocks,
-            set_blocks_to_dim,
-            set_random_colour_blocks,
-            set_blocks_to_dim,
-            set_random_colour_blocks,
-            set_blocks_to_dim,
+            set_blocks_to_fade_to_dim,
+            set_blocks_to_fade_to_rand_colours,
+            set_blocks_to_fade_to_dim,
+            set_blocks_to_fade_to_rand_colours,
+            set_blocks_to_fade_to_dim,
+            set_blocks_to_fade_to_colour_arrays,
+            set_rotate_block_states,
+            set_blocks_to_fade_to_dim,
             set_successive_rainbow_blocks,
             set_go_out_successive_blocks,
             set_right_random_wibblefest,
@@ -253,14 +293,14 @@ if __name__ == '__main__':
             set_right_random_wibblefest,
             set_successive_random_colour_blocks,
             set_right_random_wibblefest,
-            set_blocks_to_dim,
+            set_blocks_to_fade_to_dim,
             set_right_random_wibblefest,
-            set_blocks_to_dim,
+            set_blocks_to_fade_to_dim,
             set_right_random_wibblefest,
-            set_blocks_to_dim,
+            set_blocks_to_fade_to_dim,
             set_rainbows_fade,
             set_cycling_rainbow_blocks,
-            set_blocks_to_dim,
+            set_blocks_to_fade_to_dim,
             ]
 
     args = handle_cmd_args()
@@ -301,7 +341,7 @@ if __name__ == '__main__':
 
     # Shut it all down quietly...
     debug_print(1, "closing down... at {0}".format(datetime.now()))
-    actors = set_blocks_to_black(ALL)
+    actors = set_blocks_to_fade_black(ALL)
     stepcount = 120
     cluster = q.bundle(pixels, wait=0.5, steps=stepcount)
     for actor in actors:

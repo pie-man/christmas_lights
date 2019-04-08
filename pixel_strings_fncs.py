@@ -45,17 +45,32 @@ def create_index(pixels, index_start, index_end, step=1, reverse=False):
         index.reverse()
     return index
 
-def make_colour_state_rgb(index, rgb_colour):
+def make_single_colour_state_rgb(index, rgb_colour):
     active_pixels = len(index)
     colour_state = []
     for i in range(active_pixels):
         colour_state.append(rgb_colour)
     return colour_state
 
-def make_colour_state(index, colour):
+def make_single_colour_state(index, colour):
     '''Cheat a bit here : we're making an array of whatever we got
     passed, so an int can be treated the same as a tuple'''
-    return make_colour_state_rgb(index, colour)
+    return make_single_colour_state_rgb(index, colour)
+
+def make_multi_colour_state_rgb(index, rgb_colours=None):
+    active_pixels = len(index)
+    colour_state = []
+    if rgb_colours is None:
+        rgb_colours = [RED, YELLOW, GREEN, BLUE,
+                       PURPLE, ORANGE]
+    num_colours=len(rgb_colours)
+    colour_index=0
+    for i in range(active_pixels):
+        colour_state.append(rgb_colours[colour_index])
+        colour_index += 1
+        if colour_index >= num_colours:
+            colour_index = 0
+    return colour_state
 
 def make_rainbow_state_rgb(index):
     active_pixels = len(index)
@@ -201,14 +216,14 @@ def light_up_successive_rgb(pixels, index, new_state,
 def go_out_successive_rgb(pixels, index, not_used, steps=25, reverse=False):
     '''Turns the pixels 'off' in clusters such that there are the same
     number of clusters as there are steps.'''
-    state = make_colour_state_rgb(index, (0,0,0))
+    state = make_single_colour_state_rgb(index, (0,0,0))
     return self.light_up_successive(pixels, index, state,
                                     steps, reverse)
 
 def go_dim_successive_rgb(pixels, index, not_used, steps=25, reverse=False):
     '''Turns the pixels 'dark' in clusters such that there are the same
     number of clusters as there are steps.'''
-    state = make_colour_state_rgb(index, (1,1,1))
+    state = make_single_colour_state_rgb(index, (1,1,1))
     return self.light_up_successive(pixels, index, state,
                                     steps, reverse)
 
