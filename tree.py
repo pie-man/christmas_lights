@@ -20,6 +20,9 @@ MIDDLE = range(7, 24)
 BOTTOM = range(7)
 ALL = [TOP, MIDDLE, BOTTOM]
 
+# Set agloabal print level in case file is imported.
+print_level = 1
+
 def set_fade_to_rainbow(pixel_index):
     '''Set the pixels refered to by pixel_index to fade to
        a full rainbow spread around the 'colour wheel'.'''
