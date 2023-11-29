@@ -46,6 +46,8 @@ def create_index(pixels, index_start, index_end, step=1, reverse=False):
     return index
 
 def make_single_colour_state_rgb(index, rgb_colour):
+    '''Takes a list (index) and a tuple defining an RGB colour.
+    Returns a list, the same length as index, of the colour tuples''' 
     active_pixels = len(index)
     colour_state = []
     for i in range(active_pixels):
@@ -58,6 +60,9 @@ def make_single_colour_state(index, colour):
     return make_single_colour_state_rgb(index, colour)
 
 def make_multi_colour_state_rgb(index, rgb_colours=None):
+    '''Takes a list (index) and a list of RGB colour tuples.
+    Returns a list, the same length as index, of colour tuples formed
+    by cycling through the list of colour tuples provided.'''
     active_pixels = len(index)
     colour_state = []
     if rgb_colours is None:
