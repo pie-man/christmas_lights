@@ -43,8 +43,8 @@ def make_multi_colour_state_tuple(count, colour_tuple_list=None):
     by cycling through the list of colour tuples provided.'''
     colour_state = []
     if colour_tuple_list is None:
-        colour_tuple_list = [RED, YELLOW, GREEN, BLUE,
-                       PURPLE, ORANGE]
+        colour_tuple_list = [RED_RGB, YELLOW_RGB, GREEN_RGB, BLUE_RGB,
+                       PURPLE_RGB, ORANGE_RGB]
     num_colours=len(colour_tuple_list)
     colour_index=0
     for i in range(count):
