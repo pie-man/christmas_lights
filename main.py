@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Here from previous version. May want to connect to t'internet, so left for now
 #import WIFI_CONFIG
 #from network_manager import NetworkManager
