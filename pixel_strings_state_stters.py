@@ -1,4 +1,14 @@
 '''
+Some routines to set a 'state'. A state being a list of colours.
+Potentially colours can be a tuple for red, blue and green (in various orders)
+or a tuple for Hue, Saturarion and Value
+or a 'hex' value (and possibly other scalar values to store the colour)
+
+It may be that the 'state' should also the indecies of the pixels being set, but
+this may get complicated as previously 'actors' which animate lights accept
+'states' and apply them to subsections of the string. So somewhere along the
+line an 'offset' needs to be used to allow mapping betweeen a 'local' index and
+the global one.
 '''
 
 # Define some set RGB colours by name
