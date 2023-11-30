@@ -24,7 +24,7 @@ NUM_LEDS = 50 # Total nuber of LEDs in the strings (including any ignored ones)
 from machine import Pin
 pico_led = Pin('LED', Pin.OUT)
 
-# set up the WS2812 / NeoPixel¿ LEDs
+# set up the WS2812 / NeoPixelÂ¿ LEDs
 import plasma
 from plasma import plasma_stick
 led_strip = plasma.WS2812(NUM_LEDS, 0, 0, plasma_stick.DAT, color_order=plasma.COLOR_ORDER_RGB)
