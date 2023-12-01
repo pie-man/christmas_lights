@@ -50,54 +50,110 @@ def update_led_string(led_strip, strip_length, indicies, state, clean=False):
         # Then update the one's reffered to by indicie
         for count, index in enumerate(indicies):
             updated_state[index] = state[count]
-            print(f"Patching index {index} to {state[count]}")
+            #print(f"Patching index {index} to {state[count]}")
         indicies = list(range(strip_length))
         state = updated_state
-    print(f"tackled 'clean' it was {clean}")
-    time.sleep(3)
+    #print(f"tackled 'clean' it was {clean}")
+    #time.sleep(3)
     for index, colour in zip(indicies, state):
-        print(f"Setting index {index} to {colour[red_pos]}, {colour[grn_pos]},"
-                         + f" {colour[blu_pos]}")
+        #print(f"Setting index {index} to {colour[red_pos]}, {colour[grn_pos]},"
+                         #+ f" {colour[blu_pos]}")
         led_strip.set_rgb(index, colour[red_pos], colour[grn_pos],
                           colour[blu_pos])
     return
 
-print("step 1")
+#print("step 0")
+indicies = list(range(NUM_LEDS))
+state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (0,0,0))
+update_led_string(led_strip, NUM_LEDS, indicies, state)
+time.sleep(1)
+
+#print("step 1")
 indicies = list(range(NUM_LEDS))
 state = state_setters.make_multi_colour_state_tuple(NUM_LEDS)     
 update_led_string(led_strip, NUM_LEDS, indicies, state)
-time.sleep(10)
+time.sleep(1)
 
-print("step 2")
+#print("step 2")
 for index in range(2,len(state),6):
-    print (f"updating index {index} to white")
+    #print (f"updating index {index} to white")
     state[index] = (200, 200, 200) # hopefully set all the green LEDS to white
 update_led_string(led_strip, NUM_LEDS, indicies, state) # Sholud see something happen here
-time.sleep(10)
+time.sleep(1)
 
-print("step 3")
+#print("step 3")
 indicies = [x for x in indicies if ((x + 4) % 6) != 0]
 # hopefully removes every 6th indicie, from the third
                    # WHich is equally hopefully, all the white ones...
 state = [state[x] for x in indicies]
-print(f"state has {len(state)} entries and indicies has {len(indicies)}")
-print(f"last entry in indicies is {indicies[-1]}")
+#print(f"state has {len(state)} entries and indicies has {len(indicies)}")
+#print(f"last entry in indicies is {indicies[-1]}")
 # remove the colour values to match
-update_led_string(led_strip, NUM_LEDS, indicies, state) # Sholud actually fail
+#update_led_string(led_strip, NUM_LEDS, indicies, state) # Sholud actually fail
 # to see a difference here as we're updating without 'clean'
-time.sleep(10)
+#time.sleep(10)
 
-print("step 4")
+#print("step 4")
 state = [state[count] for count, x in enumerate(indicies) if ((x+1)%6) != 0]
 indicies = [x for x in indicies if ((x + 1) % 6) != 0]
 # hopefully removes every 5th indicie, from the fifth
                    # WHich is equally hopefully, all the orange ones...
 
 # remove the colour values to match
-print(f"state has {len(state)} entries and indicies has {len(indicies)}")
-print(f"last entry in indicies is {indicies[-1]}")
+#print(f"state has {len(state)} entries and indicies has {len(indicies)}")
+#print(f"last entry in indicies is {indicies[-1]}")
 update_led_string(led_strip, NUM_LEDS, indicies, state, clean=True)
-time.sleep(10)
+time.sleep(1)
+
+#print("step 5")
+indicies = list(range(NUM_LEDS))
+state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (0,0,0))
+update_led_string(led_strip, NUM_LEDS, indicies, state)
+time.sleep(1)
+
+#print("step 6")
+indicies = list(range(NUM_LEDS))
+state = state_setters.make_multi_colour_state_tuple(NUM_LEDS)     
+update_led_string(led_strip, NUM_LEDS, indicies, state)
+time.sleep(4)
+
+state = state_setters.make_multi_colour_state_tuple(54)
+#while True:
+#    update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS])
+#    time.sleep(.5)
+#    state = state[1:] + [state[0]]
+
+state1 = state_setters.make_multi_colour_state_tuple(54)
+state2 = state_setters.make_multi_colour_state_tuple(54)
+for index in range(3,54,3):
+    state2[index] = (0, 0, 0)
+state3 = state_setters.make_multi_colour_state_tuple(54)
+for index in range(2,54,3):
+    state3[index] = (0, 0, 0)
+state4 = state_setters.make_multi_colour_state_tuple(54)
+for index in range(1,54,6):
+    state4[index] = (0, 0, 0)
+states=[state1, state2, state3, state4]
+outer_count=0
+inner_count=0
+state = states[outer_count]
+while True:
+    update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS])
+    time.sleep(.5)
+    state = state[1:] + [state[0]]
+    inner_count +=1
+    #print(f"Inner count is {inner_count} : outer count is {outer_count}, state is {len(state)} long")
+    if inner_count % (4* len(state)) == 0:
+        #print("Transitioning")
+        outer_count +=1
+        outer_count = outer_count % len(states)
+        inner_count = 0
+        for i in range(len(states[outer_count])):
+            state = state[1:]
+            state.append(states[outer_count][i])
+            update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS])
+            print(f"step {i}")
+            time.sleep(.5)
 
 
 #print("step 5")
