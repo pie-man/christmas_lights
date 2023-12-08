@@ -1,15 +1,13 @@
 import pytest
-import pixel_strings_state_setters
+from pixel_strings_helper_fncs import RED_RGB, YELLOW_RGB, GREEN_RGB, BLUE_RGB,\
+                       MAGENTA_RGB, ORANGE_RGB, YELLOW_HSV
 from pixel_strings_state_setters import make_single_colour_state_tuple, \
-     make_multi_colour_state_tuple
+     make_multi_colour_state_tuple, make_rainbow_state_HSV
 
 @pytest.mark.parametrize("count,colour,result",[
-(4, pixel_strings_state_setters.RED_RGB,
-    [pixel_strings_state_setters.RED_RGB] * 4),
-(5, (270, 1.0, 0.75),
-    [(270, 1.0, 0.75)] * 5),
-(6, pixel_strings_state_setters.YELLOW_HSV,
-    [pixel_strings_state_setters.YELLOW_HSV] * 6),
+(4, RED_RGB, [RED_RGB] * 4),
+(5, (270, 1.0, 0.75), [(270, 1.0, 0.75)] * 5),
+(6, YELLOW_HSV, [YELLOW_HSV] * 6),
 ])
 def test_make_single_colour_state_tuple(count, colour, result):
     '''Given a count and a tuple which defines a colour, receive a list of that
@@ -18,24 +16,12 @@ def test_make_single_colour_state_tuple(count, colour, result):
     assert got == result
  
 @pytest.mark.parametrize("count,colour_list,result",[
-(4, None,
-    [pixel_strings_state_setters.RED_RGB,
-     pixel_strings_state_setters.YELLOW_RGB,
-     pixel_strings_state_setters.GREEN_RGB,
-     pixel_strings_state_setters.BLUE_RGB]),
-(12, None,
-    [pixel_strings_state_setters.RED_RGB,
-     pixel_strings_state_setters.YELLOW_RGB,
-     pixel_strings_state_setters.GREEN_RGB,
-     pixel_strings_state_setters.BLUE_RGB,
-     pixel_strings_state_setters.PURPLE_RGB,
-     pixel_strings_state_setters.ORANGE_RGB] * 2),
-(6, [(270, 1.0, 0.75), pixel_strings_state_setters.BLUE_RGB,
-     pixel_strings_state_setters.GREEN_RGB],
-    [(270, 1.0, 0.75), pixel_strings_state_setters.BLUE_RGB,
-     pixel_strings_state_setters.GREEN_RGB] * 2),
-(6, [pixel_strings_state_setters.YELLOW_HSV],
-    [pixel_strings_state_setters.YELLOW_HSV] * 6),
+(4, None, [RED_RGB, YELLOW_RGB, GREEN_RGB, BLUE_RGB]),
+(12, None, [RED_RGB, YELLOW_RGB, GREEN_RGB, BLUE_RGB, MAGENTA_RGB,
+     ORANGE_RGB] * 2),
+(6, [(270, 1.0, 0.75), BLUE_RGB, GREEN_RGB],
+    [(270, 1.0, 0.75), BLUE_RGB, GREEN_RGB] * 2),
+(6, [YELLOW_HSV], [YELLOW_HSV] * 6),
 ])
 def test_make_multi_colour_state_tuple(count, colour_list, result):
     '''Given a count and a list of tuples which define colours,
@@ -44,3 +30,23 @@ def test_make_multi_colour_state_tuple(count, colour_list, result):
     got = make_multi_colour_state_tuple(count, colour_list)
     assert got == result
  
+@pytest.mark.parametrize("count,arc_start,arc_length,saturation,value,result",[
+(1,180,40,1.0,1.0,[(180,1.0,1.0)]),
+(6,0,180,1.0,1.0,[(  0.0,1.0,1.0), ( 30.0,1.0,1.0), ( 60.0,1.0,1.0),
+                  ( 90.0,1.0,1.0), (120.0,1.0,1.0), (150.0,1.0,1.0)]),
+(4,0,360,1.0,1.0,[(  0.0,1.0,1.0), ( 90.0,1.0,1.0), (180.0,1.0,1.0),
+                  (270.0,1.0,1.0) ]),
+(8,0,720,1.0,1.0,[(  0.0,1.0,1.0), ( 90.0,1.0,1.0), (180.0,1.0,1.0),
+                  (270.0,1.0,1.0), (  0.0,1.0,1.0), ( 90.0,1.0,1.0),
+                  (180.0,1.0,1.0), (270.0,1.0,1.0)]),
+])
+def test_make_rainbow_state_HSV(count, arc_start, arc_length,
+                           saturation, value, result):
+    '''
+    Given a count, a start point in degrees and an arc length, should get back a
+    list of length count with evenly spaced points along the arc as the 'hue' of
+    an HSV colour tuple
+    '''
+    got = make_rainbow_state_HSV(count, arc_start, arc_length,
+                                 saturation, value) 
+    assert got == result

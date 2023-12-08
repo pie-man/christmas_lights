@@ -11,23 +11,8 @@ line an 'offset' needs to be used to allow mapping betweeen a 'local' index and
 the global one.
 '''
 
-# Define some set RGB colours by name
-RED_RGB    = (200,   0,   0)
-YELLOW_RGB = (127, 127,   0)
-GREEN_RGB  = (  0, 200,   0)
-BLUE_RGB   = (  0,   0, 200)
-PURPLE_RGB = (127,   0, 127)
-ORANGE_RGB = (195,  60,   0)
-
-# Define some set HSV colours by name
-RED_HSV    = (  0,   1,   1)
-YELLOW_HSV = ( 60,   1,   1)
-GREEN_HSV  = (120,   1,   1)
-BLUE_HSV   = (240,   1,   1)
-PURPLE_HSV = (300,   1,   1)
-ORANGE_HSV = ( 30,   1,   1)
-
-
+from pixel_strings_helper_fncs import RED_RGB, YELLOW_RGB, GREEN_RGB, BLUE_RGB,\
+                       MAGENTA_RGB, ORANGE_RGB
 
 def make_single_colour_state_tuple(count, colour_tuple):
     '''Takes a count and a tuple defining an RGB or HSV colour.
@@ -44,7 +29,7 @@ def make_multi_colour_state_tuple(count, colour_tuple_list=None):
     colour_state = []
     if colour_tuple_list is None:
         colour_tuple_list = [RED_RGB, YELLOW_RGB, GREEN_RGB, BLUE_RGB,
-                       PURPLE_RGB, ORANGE_RGB]
+                       MAGENTA_RGB, ORANGE_RGB]
     num_colours=len(colour_tuple_list)
     colour_index=0
     for i in range(count):
@@ -54,24 +39,23 @@ def make_multi_colour_state_tuple(count, colour_tuple_list=None):
             colour_index = 0
     return colour_state
 
-# : Needs to call out to a wheel, function. :
-#=- def make_rainbow_state_rgb(index):
-#=-     active_pixels = len(index)
-#=-     rainbow_state = []
-#=-     for i in range(active_pixels):
-#=-         colour = wheel_rgb(i, spread=active_pixels+1)
-#=-         rainbow_state.append(colour)
-#=-     return rainbow_state
-#=-
-# : Needs to call out to a wheel, function. :
-#=- def make_rainbow_state(index):
-#=-     active_pixels = len(index)
-#=-     rainbow_state = []
-#=-     for i in range(active_pixels):
-#=-         colour = wheel(i, spread=active_pixels+1)
-#=-         rainbow_state.append(colour)
-#=-     return rainbow_state
-#=-
+def make_rainbow_state_HSV(count, arc_start=0, arc_length=360,
+                           saturation=1.0, value=1.0):
+    '''
+       Creates a list of 'count' HSV colour tuples spread evenly along an 'arc'
+       of length 'arc_length' degrees (could be 720 for 2 full rainbows)
+       starting from point 'arc_start'.
+       saturation and value default to 1 and are just passed through and used in
+       the returned tuples. Set value to a lower decimal, e.g. 0.75, to reduce
+       the brightness of the string.
+    '''
+    rainbow_state = []
+    arc_increments = arc_length / count
+    for pixel in range(count):
+        hue = ((pixel * arc_increments) + arc_start) % 360
+        rainbow_state.append((hue, saturation, value))
+    return rainbow_state
+
 # : This block could be methods in a 'state' object
 # : which also stores the current 'state' as the plasma lights don't wheras the
 # : Adafruit library for WS2801 s did.
@@ -106,32 +90,3 @@ def make_multi_colour_state_tuple(count, colour_tuple_list=None):
 #:         pixels.set_pixel(index[i],state[i])
 #=-
 
-# Define an alternative function to interpolate between different hues.
-# This function defines 'spread' separate colours
-def wheel(pos, spread):
-    (red, green, blue) = wheel_rgb(pos, spread)
-    return Adafruit_WS2801.RGB_to_color(red, green, blue)
-
-def wheel_rgb(pos, spread):
-    pos = pos % spread
-    band = spread/3.0
-    def scale_val(val):
-        mult = 255.0 / band
-        return int(val * mult)
-    if pos < band:
-        return (scale_val(pos), scale_val(int(band - pos)), 0)
-    elif pos < (2 * band):
-        pos -= int(band)
-        return (scale_val(int(band - pos)), 0, scale_val(pos))
-    else:
-        pos -= int(2 * band)
-        return (0, scale_val(pos), scale_val(int(band - pos)))
-
-def get_random_colour_rgb(spread=360):
-    pos = randint(0,spread)
-    return wheel_rgb(pos, spread)
- 
-def get_random_colour(spread=360):
-    pos = randint(0,spread)
-    return wheel(pos, spread)
- 

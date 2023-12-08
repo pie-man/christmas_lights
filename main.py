@@ -38,7 +38,8 @@ blu_pos = 2
 # start updating the LED strip
 led_strip.start()
 
-def update_led_string(led_strip, strip_length, indicies, state, clean=False):
+def update_led_string(led_strip, strip_length, indicies, state,
+                      colour_type='RGB', clean=False):
     ''' Match the colour settings in 'state' to the indices provided and apply
     them to the led_strip. If clean IS set, turn all other LEDs in the
     strip off'''
@@ -46,7 +47,11 @@ def update_led_string(led_strip, strip_length, indicies, state, clean=False):
         raise exception("State and indices not of same length")
     if clean:
         # First assign all LEDs to be 'off'
-        updated_state = [(0,0,0) for i in range(strip_length)]
+        if colour_type.upper() == "RGB":
+            colour_tuple = (0, 0, 0)
+        else:
+            colour_tuple = (0, 1.0, 0.0)
+        updated_state = [colour_tuple for i in range(strip_length)]
         # Then update the one's reffered to by indicie
         for count, index in enumerate(indicies):
             updated_state[index] = state[count]
@@ -55,11 +60,14 @@ def update_led_string(led_strip, strip_length, indicies, state, clean=False):
         state = updated_state
     #print(f"tackled 'clean' it was {clean}")
     #time.sleep(3)
+    if colour_type.upper() == "RGB":
+        setter = led_strip.set_rgb
+    else:
+        setter = led_strip.set_hsv
     for index, colour in zip(indicies, state):
         #print(f"Setting index {index} to {colour[red_pos]}, {colour[grn_pos]},"
                          #+ f" {colour[blu_pos]}")
-        led_strip.set_rgb(index, colour[red_pos], colour[grn_pos],
-                          colour[blu_pos])
+        setter(index, colour[0], colour[1], colour[2])
     return
 
 #print("step 0")
@@ -84,7 +92,7 @@ time.sleep(1)
 #print("step 3")
 indicies = [x for x in indicies if ((x + 4) % 6) != 0]
 # hopefully removes every 6th indicie, from the third
-                   # WHich is equally hopefully, all the white ones...
+                   # Which is equally hopefully, all the white ones...
 state = [state[x] for x in indicies]
 #print(f"state has {len(state)} entries and indicies has {len(indicies)}")
 #print(f"last entry in indicies is {indicies[-1]}")
@@ -97,7 +105,7 @@ state = [state[x] for x in indicies]
 state = [state[count] for count, x in enumerate(indicies) if ((x+1)%6) != 0]
 indicies = [x for x in indicies if ((x + 1) % 6) != 0]
 # hopefully removes every 5th indicie, from the fifth
-                   # WHich is equally hopefully, all the orange ones...
+                   # Which is equally hopefully, all the orange ones...
 
 # remove the colour values to match
 #print(f"state has {len(state)} entries and indicies has {len(indicies)}")
@@ -137,7 +145,7 @@ states=[state1, state2, state3, state4]
 outer_count=0
 inner_count=0
 state = states[outer_count]
-while True:
+for _ in range(len(state1) + len(state2) + len(state3) + len(state4) + NUM_LEDS):
     update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS])
     time.sleep(.5)
     state = state[1:] + [state[0]]
@@ -156,10 +164,19 @@ while True:
             time.sleep(.5)
 
 
-#print("step 5")
-#indicies = list(range(NUM_LEDS))
-#state = state_setters.make_multi_colour_state_tuple(NUM_LEDS)     
-#update_led_string(led_strip, NUM_LEDS, indicies, state)
-#time.sleep(10)
+#print("step 7")
+indicies = list(range(NUM_LEDS))
+state = state_setters.make_rainbow_state_HSV(NUM_LEDS, arc_length=720,
+                                             value=0.75)     
+update_led_string(led_strip, NUM_LEDS, indicies, state)
+time.sleep(5)
+for _ in range(NUM_LEDS * 2):
+    update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS])
+    time.sleep(.5)
+    state = state[1:] + [state[0]]
+for _ in range(NUM_LEDS * 2):
+    update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS])
+    time.sleep(.5)
+    state = [state[-1]] + state[0:-1]
 
 
