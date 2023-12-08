@@ -53,7 +53,7 @@ def make_rainbow_state_HSV(count, arc_start=0, arc_length=360,
     arc_increments = arc_length / count
     for pixel in range(count):
         hue = ((pixel * arc_increments) + arc_start) % 360
-        rainbow_state.append((hue, saturation, value))
+        rainbow_state.append((hue/360, saturation, value))
     return rainbow_state
 
 # : This block could be methods in a 'state' object
