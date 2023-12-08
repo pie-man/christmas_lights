@@ -22,7 +22,20 @@ ALL = [TOP, MIDDLE, BOTTOM]
 
 # Set agloabal print level in case file is imported.
 print_level = 1
-
+'''
+ In the following routines there would appear to be the following common names:
+   pixel_index : is a list containing the indicies of the pixels being operated
+     on (these indicies do not need to be contiguous, but they should exist in
+     the pixel string being used)
+   collections : Is a list of collections, where a single collection is
+     equivalent to a pixel_list
+   actor : Is an iterator function which yeilds a new state to be mapped to a
+     pixel_index at each stage of an animation or transition.
+     (In the original code, actors actually called the set_pixel method of the
+     Adafruit pixel library, however the plasma string library does not appear
+     to have a similar function, so an actor should yield a state (list) and a
+     pixel_list (list) to which the state can be applied at each step.
+'''
 def set_fade_to_rainbow(pixel_index):
     '''Set the pixels refered to by pixel_index to fade to
        a full rainbow spread around the 'colour wheel'.'''

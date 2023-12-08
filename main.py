@@ -39,7 +39,7 @@ blu_pos = 2
 led_strip.start()
 
 def update_led_string(led_strip, strip_length, indicies, state, clean=False):
-    ''' Match the colour settings in 'state' to the indices provided and applpy
+    ''' Match the colour settings in 'state' to the indices provided and apply
     them to the led_strip. If clean IS set, turn all other LEDs in the
     strip off'''
     if len(indicies) != len(state):
