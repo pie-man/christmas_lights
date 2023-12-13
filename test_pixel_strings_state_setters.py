@@ -1,6 +1,8 @@
 import pytest
 from pixel_strings_helper_fncs import RED_RGB, YELLOW_RGB, GREEN_RGB, BLUE_RGB,\
-                       MAGENTA_RGB, ORANGE_RGB, YELLOW_HSV
+                       MAGENTA_RGB, ORANGE_RGB
+from pixel_strings_helper_fncs import RED_HSV, YELLOW_HSV, GREEN_HSV, BLUE_HSV,\
+                       MAGENTA_HSV, ORANGE_HSV
 from pixel_strings_state_setters import make_single_colour_state_tuple, \
      make_multi_colour_state_tuple, make_rainbow_state_HSV
 
@@ -16,9 +18,9 @@ def test_make_single_colour_state_tuple(count, colour, result):
     assert got == result
  
 @pytest.mark.parametrize("count,colour_list,result",[
-(4, None, [RED_RGB, YELLOW_RGB, GREEN_RGB, BLUE_RGB]),
-(12, None, [RED_RGB, YELLOW_RGB, GREEN_RGB, BLUE_RGB, MAGENTA_RGB,
-     ORANGE_RGB] * 2),
+(4, None, [RED_HSV, YELLOW_HSV, GREEN_HSV, BLUE_HSV]),
+(12, None, [RED_HSV, YELLOW_HSV, GREEN_HSV, BLUE_HSV, MAGENTA_HSV,
+     ORANGE_HSV] * 2),
 (6, [(270, 1.0, 0.75), BLUE_RGB, GREEN_RGB],
     [(270, 1.0, 0.75), BLUE_RGB, GREEN_RGB] * 2),
 (6, [YELLOW_HSV], [YELLOW_HSV] * 6),
