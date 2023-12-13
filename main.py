@@ -6,6 +6,7 @@
 #import urequests
 import time
 import pixel_strings_state_setters as state_setters
+from pixel_strings_actors import fade_to_state_HSV 
 
 '''
 Code intended to be run on boot which controlls the individually programmable

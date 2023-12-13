@@ -14,7 +14,7 @@ def fade_to_state_HSV(count, old_state, new_state, steps=25):
         elif new_state[pixel_transition][2] == 0: # Value == 0, new colour is black
             transition_tuples.append( (1, 1, 1.0/steps) )
         else: # In this case we're adjusting Hue, primarily, but will allow for the other two to vary as well
-            transition_tuples.append( (1.0/steps, 1.0/steps, 1.0/steps) )
+            transition_tuples.append( (1.0/steps, 1.0, 1.0) )
     for step in range(steps):
         state=[]
         for pixel in range(count):
