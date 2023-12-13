@@ -30,15 +30,14 @@ def test_make_multi_colour_state_tuple(count, colour_list, result):
     got = make_multi_colour_state_tuple(count, colour_list)
     assert got == result
  
+degrees_decimal= 30.0/360
 @pytest.mark.parametrize("count,arc_start,arc_length,saturation,value,result",[
-(1,180,40,1.0,1.0,[(180,1.0,1.0)]),
-(6,0,180,1.0,1.0,[(  0.0,1.0,1.0), ( 30.0,1.0,1.0), ( 60.0,1.0,1.0),
-                  ( 90.0,1.0,1.0), (120.0,1.0,1.0), (150.0,1.0,1.0)]),
-(4,0,360,1.0,1.0,[(  0.0,1.0,1.0), ( 90.0,1.0,1.0), (180.0,1.0,1.0),
-                  (270.0,1.0,1.0) ]),
-(8,0,720,1.0,1.0,[(  0.0,1.0,1.0), ( 90.0,1.0,1.0), (180.0,1.0,1.0),
-                  (270.0,1.0,1.0), (  0.0,1.0,1.0), ( 90.0,1.0,1.0),
-                  (180.0,1.0,1.0), (270.0,1.0,1.0)]),
+(1,180,40,1.0,1.0,[( 0.5,1.0,1.0)]),
+(4,0,180,1.0,1.0,[( 0.00,1.0,1.0), ( 0.125,1.0,1.0), ( 0.250,1.0,1.0), ( 0.375,1.0,1.0)]),
+(4,0,360,1.0,1.0,[( 0.00,1.0,1.0), ( 0.25,1.0,1.0), ( 0.50,1.0,1.0), ( 0.75,1.0,1.0) ]),
+(8,0,720,1.0,1.0,[( 0.00,1.0,1.0), ( 0.25,1.0,1.0), ( 0.50,1.0,1.0),
+                  ( 0.75,1.0,1.0), ( 0.00,1.0,1.0), ( 0.25,1.0,1.0),
+                  ( 0.50,1.0,1.0), ( 0.75,1.0,1.0)]),
 ])
 def test_make_rainbow_state_HSV(count, arc_start, arc_length,
                            saturation, value, result):
@@ -49,4 +48,4 @@ def test_make_rainbow_state_HSV(count, arc_start, arc_length,
     '''
     got = make_rainbow_state_HSV(count, arc_start, arc_length,
                                  saturation, value) 
-    assert got == result
+    assert got == pytest.approx(result)
