@@ -15,14 +15,12 @@ def fade_to_state_HSV(count, old_state, new_state, steps=25):
             transition_tuples.append( (1, 1, 1.0/steps) )
         else: # In this case we're adjusting Hue, primarily, but will allow for the other two to vary as well
             transition_tuples.append( (1.0/steps, 1.0/steps, 1.0/steps) )
-    
     for step in range(steps):
         state=[]
         for pixel in range(count):
             state.append(tuple(el2*adj*step + (el1 * (1.0-(adj * step))) for el1, el2, adj in zip(old_state[pixel],new_state[pixel],transition_tuples[pixel])))
-        yeild state
-    
-    yeild new_state
+        yield state
+    yield new_state
 
 
 #=- def fade_to_state_rgb(pixels, index, new_state, steps=25, reverse=False):
