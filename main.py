@@ -39,12 +39,12 @@ blu_pos = 2
 led_strip.start()
 
 def update_led_string(led_strip, strip_length, indicies, state,
-                      colour_type='RGB', clean=False):
+                      colour_type='HSV', clean=False):
     ''' Match the colour settings in 'state' to the indices provided and apply
     them to the led_strip. If clean IS set, turn all other LEDs in the
     strip off'''
     if len(indicies) != len(state):
-        raise exception("State and indices not of same length")
+        raise Exception("State and indices not of same length")
     if clean:
         # First assign all LEDs to be 'off'
         if colour_type.upper() == "RGB":
@@ -70,116 +70,90 @@ def update_led_string(led_strip, strip_length, indicies, state,
         setter(index, colour[0], colour[1], colour[2])
     return
 
+# Start 'dark'
 print("step 0")
 indicies = list(range(NUM_LEDS))
-state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (0,0,0))
+state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (1,1,0))
 update_led_string(led_strip, NUM_LEDS, indicies, state)
-time.sleep(1)
 
+# Fade in a nice set of repeating colours
 print("step 1")
-indicies = list(range(NUM_LEDS))
-state = state_setters.make_multi_colour_state_tuple(NUM_LEDS)     
-update_led_string(led_strip, NUM_LEDS, indicies, state)
-time.sleep(1)
+old_state = state
+new_state = state_setters.make_multi_colour_state_tuple(NUM_LEDS)     
+transition = fade_to_state_HSV(NUM_LEDS, old_state, new_state, steps=20)
+for state in transition:
+    update_led_string(led_strip, NUM_LEDS, indicies, state)
+    time.sleep(0.1)
 
+time.sleep(10)
+
+# Fade to black
 print("step 2")
-for index in range(2,len(state),6):
-    #print (f"updating index {index} to white")
-    state[index] = (200, 200, 200) # hopefully set all the green LEDS to white
-update_led_string(led_strip, NUM_LEDS, indicies, state) # Sholud see something happen here
-time.sleep(1)
+old_state = state
+new_state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (1,1,0))
+transition = fade_to_state_HSV(NUM_LEDS, old_state, new_state, steps=20)
+for state in transition:
+    update_led_string(led_strip, NUM_LEDS, indicies, state)
+    time.sleep(0.1)
+
+#=- for _ in range(NUM_LEDS):
+#=- #for _ in range(len(state1) + len(state2) + len(state3) + len(state4) + NUM_LEDS):
+#=-     update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS])
+#=-     time.sleep(.5)
+#=-     state = state[1:] + [state[0]]
+#=-     inner_count +=1
+#=-     if inner_count % 15 == 0:
+#=-         print(f"Inner count is {inner_count} : outer count is {outer_count}, state is {len(state)} long")
+#=-     if inner_count % (2* len(state)) == 0:
+#=-         print("Transitioning")
+#=-         outer_count +=1
+#=-         outer_count = outer_count % len(states)
+#=-         inner_count = 0
+#=-         for i in range(len(states[outer_count])):
+#=-             state = state[1:]
+#=-             state.append(states[outer_count][i])
+#=-             update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS])
+#=-             if i%10 ==0:
+#=-                 print(f"step {i}")
+#=-             time.sleep(.5)
+
 
 print("step 3")
-indicies = [x for x in indicies if ((x + 4) % 6) != 0]
-# hopefully removes every 6th indicie, from the third
-                   # Which is equally hopefully, all the white ones...
-state = [state[x] for x in indicies]
-#print(f"state has {len(state)} entries and indicies has {len(indicies)}")
-#print(f"last entry in indicies is {indicies[-1]}")
-# remove the colour values to match
-#update_led_string(led_strip, NUM_LEDS, indicies, state) # Sholud actually fail
-# to see a difference here as we're updating without 'clean'
-#time.sleep(10)
+old_state = state
+new_state = state_setters.make_rainbow_state_HSV(NUM_LEDS, arc_length=360,
+                                                 value=0.75)     
+transition = fade_to_state_HSV(NUM_LEDS, old_state, new_state, steps=20)
+for state in transition:
+    update_led_string(led_strip, NUM_LEDS, indicies, state, colour_type='HSV')
+    time.sleep(0.1)
+
+time.sleep(5)
 
 print("step 4")
-state = [state[count] for count, x in enumerate(indicies) if ((x+1)%6) != 0]
-indicies = [x for x in indicies if ((x + 1) % 6) != 0]
-# hopefully removes every 5th indicie, from the fifth
-                   # Which is equally hopefully, all the orange ones...
-
-# remove the colour values to match
-#print(f"state has {len(state)} entries and indicies has {len(indicies)}")
-#print(f"last entry in indicies is {indicies[-1]}")
-update_led_string(led_strip, NUM_LEDS, indicies, state, clean=True)
-time.sleep(1)
+for _ in range(NUM_LEDS * 2):
+    old_state = state
+    new_state = state[1:] + [state[0]]
+    transition = fade_to_state_HSV(NUM_LEDS, old_state, new_state, steps=10)
+    for state in transition:
+        update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS], colour_type='HSV')
+        time.sleep(0.05)
 
 print("step 5")
-indicies = list(range(NUM_LEDS))
-state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (0,0,0))
-update_led_string(led_strip, NUM_LEDS, indicies, state)
-time.sleep(1)
+for _ in range(NUM_LEDS * 2):
+    old_state = state
+    new_state = [state[-1]] + state[0:-1]
+    transition = fade_to_state_HSV(NUM_LEDS, old_state, new_state, steps=10)
+    for state in transition:
+        update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS], colour_type='HSV')
+        time.sleep(0.05)
 
+
+# Fade to black
 print("step 6")
-indicies = list(range(NUM_LEDS))
-state = state_setters.make_multi_colour_state_tuple(NUM_LEDS)     
-update_led_string(led_strip, NUM_LEDS, indicies, state)
-time.sleep(4)
-
-state = state_setters.make_multi_colour_state_tuple(54)
-#while True:
-#    update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS])
-#    time.sleep(.5)
-#    state = state[1:] + [state[0]]
-
-state1 = state_setters.make_multi_colour_state_tuple(54)
-state2 = state_setters.make_multi_colour_state_tuple(54)
-for index in range(3,54,3):
-    state2[index] = (0, 0, 0)
-state3 = state_setters.make_multi_colour_state_tuple(54)
-for index in range(2,54,3):
-    state3[index] = (0, 0, 0)
-state4 = state_setters.make_multi_colour_state_tuple(54)
-for index in range(1,54,6):
-    state4[index] = (0, 0, 0)
-states=[state1, state2, state3, state4]
-outer_count=0
-inner_count=0
-state = states[outer_count]
-for _ in range(NUM_LEDS):
-#for _ in range(len(state1) + len(state2) + len(state3) + len(state4) + NUM_LEDS):
-    update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS])
-    time.sleep(.5)
-    state = state[1:] + [state[0]]
-    inner_count +=1
-    if inner_count % 15 == 0:
-        print(f"Inner count is {inner_count} : outer count is {outer_count}, state is {len(state)} long")
-    if inner_count % (2* len(state)) == 0:
-        print("Transitioning")
-        outer_count +=1
-        outer_count = outer_count % len(states)
-        inner_count = 0
-        for i in range(len(states[outer_count])):
-            state = state[1:]
-            state.append(states[outer_count][i])
-            update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS])
-            if i%10 ==0:
-                print(f"step {i}")
-            time.sleep(.5)
-
-
-print("step 7")
-indicies = list(range(NUM_LEDS))
-state = state_setters.make_rainbow_state_HSV(NUM_LEDS, arc_length=360,
-                                             value=0.75)     
-update_led_string(led_strip, NUM_LEDS, indicies, state, colour_type='HSV')
-time.sleep(5)
-for _ in range(NUM_LEDS * 2):
-    update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS], colour_type='HSV')
-    time.sleep(.5)
-    state = state[1:] + [state[0]]
-for _ in range(NUM_LEDS * 2):
-    update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS], colour_type='HSV')
-    time.sleep(.5)
-    state = [state[-1]] + state[0:-1]
-
+old_state = state
+new_state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (1,1,0))
+transition = fade_to_state_HSV(NUM_LEDS, old_state, new_state, steps=20)
+for state in transition:
+    update_led_string(led_strip, NUM_LEDS, indicies, state)
+    time.sleep(0.1)
 

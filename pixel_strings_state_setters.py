@@ -11,8 +11,8 @@ line an 'offset' needs to be used to allow mapping betweeen a 'local' index and
 the global one.
 '''
 
-from pixel_strings_helper_fncs import RED_RGB, YELLOW_RGB, GREEN_RGB, BLUE_RGB,\
-                       MAGENTA_RGB, ORANGE_RGB
+from pixel_strings_helper_fncs import RED_HSV, YELLOW_HSV, GREEN_HSV, BLUE_HSV,\
+                       MAGENTA_HSV, ORANGE_HSV
 
 def make_single_colour_state_tuple(count, colour_tuple):
     '''Takes a count and a tuple defining an RGB or HSV colour.
@@ -28,8 +28,8 @@ def make_multi_colour_state_tuple(count, colour_tuple_list=None):
     by cycling through the list of colour tuples provided.'''
     colour_state = []
     if colour_tuple_list is None:
-        colour_tuple_list = [RED_RGB, YELLOW_RGB, GREEN_RGB, BLUE_RGB,
-                       MAGENTA_RGB, ORANGE_RGB]
+        colour_tuple_list = [RED_HSV, YELLOW_HSV, GREEN_HSV, BLUE_HSV,
+                       MAGENTA_HSV, ORANGE_HSV]
     num_colours=len(colour_tuple_list)
     colour_index=0
     for i in range(count):
