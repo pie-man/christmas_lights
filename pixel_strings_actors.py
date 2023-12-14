@@ -2,24 +2,60 @@ import time
 from random import randint
  
  
-def fade_to_state_HSV(count, old_state, new_state, steps=25):
+def fade_to_state_HSV_a(count, old_state, new_state, steps=25):
     ''' A function to fade from one 'state' to another.
     This function assumes both 'states' are of length 'count' and that they are lists of tuples defining a colour in terms of Hue, Saturation and Value.
     Normally, to fade from one colour to another, you just alter 'Hue', but if the target colour is white or black, you actually want to adjust saturation or value respectively. (Once you've got to white, or black, for belt-n-braces then adjust the Hue to whatever was provided so the next transition starts with whatever the coder had in mind.)
     '''
     transition_tuples = []
-    for pixel_transition in range(count):
-        if new_state [1] == 0: # Saturation == 0, new colour is white
+    for pixel in range(count):
+        if new_state[pixel][1] == 0: # Saturation == 0, new colour is white
             transition_tuples.append( (1, 1.0/steps, 1) )
-        elif new_state[pixel_transition][2] == 0: # Value == 0, new colour is black
+        elif new_state[pixel][2] == 0: # Value == 0, new colour is black
             transition_tuples.append( (1, 1, 1.0/steps) )
         else: # In this case we're adjusting Hue, primarily, but will allow for the other two to vary as well
-            transition_tuples.append( (1.0/steps, 1.0, 1.0) )
+            transition_tuples.append( (1.0/steps, 1.0/steps, 1.0/steps) )
+        # Check to see if 'wrapping' round from 1 to 0 is 'shorter' than staying within bounds.
+        # This relies on Hue having it's modulo taken to put it in a range between 0 and 1
+        if (abs(new_state[pixel][0]-old_state[pixel][0]) > 0.5:
+            old_state[pixel] = tuple(old_state[pixel][0] -1,
+                                                old_state[pixel][1], old_state[pixel][2])
     for step in range(steps):
         state=[]
         for pixel in range(count):
             state.append(tuple(el2*adj*step + (el1 * (1.0-(adj * step))) for el1, el2, adj in zip(old_state[pixel],new_state[pixel],transition_tuples[pixel])))
         yield state
+    yield new_state
+
+def fade_to_state_HSV_b(count, old_state, new_state, steps=25):
+    ''' A function to fade from one 'state' to another.
+    This function assumes both 'states' are of length 'count' and that they are lists of tuples defining a colour in terms of Hue, Saturation and Value.
+    This varient doesn't attempt to do anything 'clever' it justs fades from one set of HSV to another (rolling over
+    the HUE boundary if that's shorter than traversing within bounds)
+    '''
+    fake_state = [] # This allows for special fades to black or white, plus shortest route through Hue
+    for pixel in range(count):
+        fake_pixel_hue, fake_pixel_sat, fake_pixel_val = new_state[pixel]
+        if new_state[pixel][2] == 0: # Fading to black : Leave Hue static
+            fake_pixel_hue = old_state[pixel][0]
+        if new_state[pixel][1] == 0: # Fading to white : Leave Hue Static
+            fake_pixel_hue = old_state[pixel][0]
+        # Check to see if 'wrapping' round from 1 to 0 is 'shorter' than staying within bounds.
+        if (abs(new_state[pixel][0]-old_state[pixel][0]) > 0.5:
+            fake_pixel_hue = new_state[pixel][0] + 1
+        fake_state.append = tuple(fake_pixel_hue, fake_pixel_sat, fake_pixel_val)
+    for step in range(steps):
+        state=[]
+        for pixel in range(count):
+            old_hue, old_sat, old_val = old_state[pixel]
+            new_hue, new_sat, new_val = fake_state[pixel]
+            temp_hue = ((new_hue*(step/steps)) + (old_hue * (1.0-(step/steps))) % 1.0)
+            temp_sat = (new_sat*(step/steps)) + (old_sat * (1.0-(step/steps)))
+            temp_val = (new_val*(step/steps)) + (old_val * (1.0-(step/steps)))
+            state = (temp_hue, temp_sat, temp_val)
+        yield state
+    # By yeilding new_state as the last action we ensure the next 'stage' get's
+    # what was expected even if we went clever on fades to white or black
     yield new_state
 
 

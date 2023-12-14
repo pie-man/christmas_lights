@@ -6,7 +6,7 @@
 #import urequests
 import time
 import pixel_strings_state_setters as state_setters
-from pixel_strings_actors import fade_to_state_HSV 
+from pixel_strings_actors import fade_to_state_HSV_a, fade_to_state_HSV_b
 
 '''
 Code intended to be run on boot which controlls the individually programmable
@@ -78,10 +78,10 @@ state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (1,1,0))
 update_led_string(led_strip, NUM_LEDS, indicies, state)
 
 # Fade in a nice set of repeating colours
-print("step 1")
+print("step 1a")
 old_state = state
 new_state = state_setters.make_multi_colour_state_tuple(NUM_LEDS)     
-transition = fade_to_state_HSV(NUM_LEDS, old_state, new_state, steps=20)
+transition = fade_to_state_HSV_a(NUM_LEDS, old_state, new_state, steps=20)
 for state in transition:
     update_led_string(led_strip, NUM_LEDS, indicies, state)
     time.sleep(0.1)
@@ -89,10 +89,30 @@ for state in transition:
 time.sleep(10)
 
 # Fade to black
-print("step 2")
+print("step 2a")
 old_state = state
 new_state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (1,1,0))
-transition = fade_to_state_HSV(NUM_LEDS, old_state, new_state, steps=20)
+transition = fade_to_state_HSV_a(NUM_LEDS, old_state, new_state, steps=20)
+for state in transition:
+    update_led_string(led_strip, NUM_LEDS, indicies, state)
+    time.sleep(0.1)
+
+# Fade in a nice set of repeating colours
+print("step 1b")
+old_state = state
+new_state = state_setters.make_multi_colour_state_tuple(NUM_LEDS)     
+transition = fade_to_state_HSV_b(NUM_LEDS, old_state, new_state, steps=20)
+for state in transition:
+    update_led_string(led_strip, NUM_LEDS, indicies, state)
+    time.sleep(0.1)
+
+time.sleep(10)
+
+# Fade to black
+print("step 2b")
+old_state = state
+new_state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (1,1,0))
+transition = fade_to_state_HSV_b(NUM_LEDS, old_state, new_state, steps=20)
 for state in transition:
     update_led_string(led_strip, NUM_LEDS, indicies, state)
     time.sleep(0.1)
@@ -123,7 +143,7 @@ print("step 3")
 old_state = state
 new_state = state_setters.make_rainbow_state_HSV(NUM_LEDS, arc_length=360,
                                                  value=0.75)     
-transition = fade_to_state_HSV(NUM_LEDS, old_state, new_state, steps=20)
+transition = fade_to_state_HSV_a(NUM_LEDS, old_state, new_state, steps=20)
 for state in transition:
     update_led_string(led_strip, NUM_LEDS, indicies, state, colour_type='HSV')
     time.sleep(0.1)
@@ -134,7 +154,7 @@ print("step 4")
 for _ in range(NUM_LEDS * 2):
     old_state = state
     new_state = state[1:] + [state[0]]
-    transition = fade_to_state_HSV(NUM_LEDS, old_state, new_state, steps=10)
+    transition = fade_to_state_HSV_a(NUM_LEDS, old_state, new_state, steps=10)
     for state in transition:
         update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS], colour_type='HSV')
         time.sleep(0.05)
@@ -143,7 +163,7 @@ print("step 5")
 for _ in range(NUM_LEDS * 2):
     old_state = state
     new_state = [state[-1]] + state[0:-1]
-    transition = fade_to_state_HSV(NUM_LEDS, old_state, new_state, steps=10)
+    transition = fade_to_state_HSV_a(NUM_LEDS, old_state, new_state, steps=10)
     for state in transition:
         update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS], colour_type='HSV')
         time.sleep(0.05)
@@ -153,7 +173,46 @@ for _ in range(NUM_LEDS * 2):
 print("step 6")
 old_state = state
 new_state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (1,1,0))
-transition = fade_to_state_HSV(NUM_LEDS, old_state, new_state, steps=20)
+transition = fade_to_state_HSV_a(NUM_LEDS, old_state, new_state, steps=20)
+for state in transition:
+    update_led_string(led_strip, NUM_LEDS, indicies, state)
+    time.sleep(0.1)
+
+print("step 7")
+old_state = state
+new_state = state_setters.make_rainbow_state_HSV(NUM_LEDS, arc_length=360,
+                                                 value=0.75)     
+transition = fade_to_state_HSV_b(NUM_LEDS, old_state, new_state, steps=20)
+for state in transition:
+    update_led_string(led_strip, NUM_LEDS, indicies, state, colour_type='HSV')
+    time.sleep(0.1)
+
+time.sleep(5)
+
+print("step 8")
+for _ in range(NUM_LEDS * 2):
+    old_state = state
+    new_state = state[1:] + [state[0]]
+    transition = fade_to_state_HSV_b(NUM_LEDS, old_state, new_state, steps=10)
+    for state in transition:
+        update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS], colour_type='HSV')
+        time.sleep(0.05)
+
+print("step 9")
+for _ in range(NUM_LEDS * 2):
+    old_state = state
+    new_state = [state[-1]] + state[0:-1]
+    transition = fade_to_state_HSV_b(NUM_LEDS, old_state, new_state, steps=10)
+    for state in transition:
+        update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS], colour_type='HSV')
+        time.sleep(0.05)
+
+
+# Fade to black
+print("step 10")
+old_state = state
+new_state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (1,1,0))
+transition = fade_to_state_HSV_b(NUM_LEDS, old_state, new_state, steps=20)
 for state in transition:
     update_led_string(led_strip, NUM_LEDS, indicies, state)
     time.sleep(0.1)
