@@ -18,8 +18,8 @@ def fade_to_state_HSV_a(count, old_state, new_state, steps=25):
         # Check to see if 'wrapping' round from 1 to 0 is 'shorter' than staying within bounds.
         # This relies on Hue having it's modulo taken to put it in a range between 0 and 1
         if (abs(new_state[pixel][0]-old_state[pixel][0]) > 0.5):
-            old_state[pixel] = tuple(old_state[pixel][0] -1,
-                                                old_state[pixel][1], old_state[pixel][2])
+            old_state[pixel] = tuple([old_state[pixel][0] -1, old_state[pixel][1], old_state[pixel][2]])
+            #old_state[pixel] = tuple(old_state[pixel][0] -1, old_state[pixel][1], old_state[pixel][2])
     for step in range(steps):
         state=[]
         for pixel in range(count):
@@ -43,7 +43,7 @@ def fade_to_state_HSV_b(count, old_state, new_state, steps=25):
         # Check to see if 'wrapping' round from 1 to 0 is 'shorter' than staying within bounds.
         if (abs(new_state[pixel][0]-old_state[pixel][0]) > 0.5):
             fake_pixel_hue = new_state[pixel][0] + 1
-        fake_state.append = tuple(fake_pixel_hue, fake_pixel_sat, fake_pixel_val)
+        fake_state.append (tuple([fake_pixel_hue, fake_pixel_sat, fake_pixel_val]))
     for step in range(steps):
         state=[]
         for pixel in range(count):
@@ -52,7 +52,7 @@ def fade_to_state_HSV_b(count, old_state, new_state, steps=25):
             temp_hue = ((new_hue*(step/steps)) + (old_hue * (1.0-(step/steps))) % 1.0)
             temp_sat = (new_sat*(step/steps)) + (old_sat * (1.0-(step/steps)))
             temp_val = (new_val*(step/steps)) + (old_val * (1.0-(step/steps)))
-            state = (temp_hue, temp_sat, temp_val)
+            state.append(tuple([temp_hue, temp_sat, temp_val]))
         yield state
     # By yeilding new_state as the last action we ensure the next 'stage' get's
     # what was expected even if we went clever on fades to white or black

@@ -1,27 +1,12 @@
-#!/usr/bin/env python
-# Here from previous version. May want to connect to t'internet, so left for now
-#import WIFI_CONFIG
-#from network_manager import NetworkManager
-#import uasyncio
-#import urequests
+# Basic Imports
 import time
+import random
 import pixel_strings_state_setters as state_setters
 from pixel_strings_actors import fade_to_state_HSV_a, fade_to_state_HSV_b
 
-'''
-Code intended to be run on boot which controlls the individually programmable
-LED lights on a Christmas tree.
-'''
+NUM_LEDS = 100 # Total nuber of LEDs in the strings (including any ignored ones)
 
-NUM_LEDS = 50 # Total nuber of LEDs in the strings (including any ignored ones)
-
-## This may want to become a 'class' for the pico W,
-## possibly to be considered always paired to the WS2812 LEDs
-## __init__(no_of_LEDs, type_of_LED): etc...
-## Then the same code could be re-used in differing projects and a new class
-## instnace for each physical setup made.
-
-# The onboard LED
+# The onboard LED - probably don't need it...
 from machine import Pin
 pico_led = Pin('LED', Pin.OUT)
 
@@ -29,12 +14,6 @@ pico_led = Pin('LED', Pin.OUT)
 import plasma
 from plasma import plasma_stick
 led_strip = plasma.WS2812(NUM_LEDS, 0, 0, plasma_stick.DAT, color_order=plasma.COLOR_ORDER_RGB)
-
-# When calling library routines to set r,g,b values, not all kit uses
-# them in rgb order...
-red_pos = 0
-grn_pos = 1
-blu_pos = 2
 
 # start updating the LED strip
 led_strip.start()
@@ -45,7 +24,7 @@ def update_led_string(led_strip, strip_length, indicies, state,
     them to the led_strip. If clean IS set, turn all other LEDs in the
     strip off'''
     if len(indicies) != len(state):
-        raise Exception("State and indices not of same length")
+        raise Exception(f"State {len(state)} and indices {len(indicies)} not of same length")
     if clean:
         # First assign all LEDs to be 'off'
         if colour_type.upper() == "RGB":
@@ -66,10 +45,134 @@ def update_led_string(led_strip, strip_length, indicies, state,
     else:
         setter = led_strip.set_hsv
     for index, colour in zip(indicies, state):
-        #print(f"Setting index {index} to {colour[red_pos]}, {colour[grn_pos]},"
-                         #+ f" {colour[blu_pos]}")
         setter(index, colour[0], colour[1], colour[2])
     return
+
+def zooming_blocks(pixel_count, old_state, new_state, steps=25, number_of_blocks=6, gap_ratio=1.0):
+    #noblocks = 6
+    if gap_ratio < 0.0:
+        gap_ratio = 0.0
+    section_length = int(pixel_count // number_of_blocks)
+    block_length = int(section_length // (1 + gap_ratio))
+    gap_length = section_length - block_length
+    #print(f"section_length is {section_length}")
+    #print(f"block_length is {block_length}")
+    #print(f"gap_length is {gap_length}\n")
+    while (gap_length / block_length) > gap_ratio:
+        print(f"Calculated {gap_length / block_length}, prepare for lift off...")
+        gap_length -= 1
+        block_length +=1
+    print(f"Final calculated {gap_length / block_length}, We are in orbit")
+    #print(f"section_length is {section_length}")
+    #print(f"block_length is {block_length}")
+    #print(f"gap_length is {gap_length}\n")
+
+    blocks=[]
+    colours = []
+    # Create a list of lists. Each lists contains a block of indecies for pixels
+    # This first bit is a really overengineered way to 'space' out the left over pixels..
+    # If there are more 'left over pixels than blocks - add one to the block length until there aren't
+    gap_size = pixel_count - (number_of_blocks * section_length)
+    print(f"Gap Size is {gap_size}")
+    while gap_size >= number_of_blocks:
+        print("A quick lap of the moon folks....\n")
+        block_length += 1
+        gap_size -= number_of_blocks
+    if gap_length > 1:
+        block_length += 1
+        gap_length -= 1
+    print(f"section_length is still {section_length}")
+    print(f"gap_length is {gap_length}")
+    print(f"block_length is {block_length}")
+
+    values = list(a / (block_length - 1) for a in range(block_length))
+    #print(values, "\n")
+    
+    for count in range(number_of_blocks):
+        if count <= gap_size:
+            boost = count
+        else:
+            boost = gap_size
+        new_block = list(a + (count * section_length) + boost for a in range(block_length))
+        #print(f"got a block like this : {new_block}")
+        blocks.append(new_block)
+        colours.append(count / number_of_blocks)
+
+
+    #for steps in range(pixel_count * 3):
+    for _ in range(steps):
+        for point in range(block_length):
+            count = 0
+            for block in blocks:
+                block[point] += 1
+                block[point] = block[point]%pixel_count
+                state[block[point]] = (colours[count],1,values[point])
+                count += 1
+        update_led_string(led_strip, pixel_count, indicies, state)
+        time.sleep(0.1)
+    print("... All Done ...")
+    
+def bouncing_blocks(pixel_count, old_state, new_state, steps=25, number_of_blocks=6, gap_ratio=1.0):
+    #noblocks = 6
+    if gap_ratio < 0.0:
+        gap_ratio = 0.0
+    section_length = int(pixel_count // number_of_blocks)
+    block_length = int(section_length // (1 + gap_ratio))
+    gap_length = section_length - block_length
+    #print(f"section_length is {section_length}")
+    #print(f"block_length is {block_length}")
+    #print(f"gap_length is {gap_length}\n")
+    while (gap_length / block_length) > gap_ratio:
+        #print(f"Calculated {gap_length / block_length}, prepare for lift off...")
+        gap_length -= 1
+        block_length +=1
+    #print(f"Final calculated {gap_length / block_length}, We are in orbit")
+    #print(f"section_length is {section_length}")
+    #print(f"block_length is {block_length}")
+    #print(f"gap_length is {gap_length}\n")
+
+    blocks=[]
+    colours = []
+    # Create a list of lists. Each lists contains a block of indecies for pixels
+    # This first bit is a really overengineered way to 'space' out the left over pixels..
+    # If there are more 'left over pixels than blocks - add one to the block length until there aren't
+    gap_size = pixel_count - (number_of_blocks * section_length)
+    #print(f"Gap Size is {gap_size}")
+    while gap_size >= number_of_blocks:
+        #print("A quick lap of the moon folks....\n")
+        block_length += 1
+        gap_size -= number_of_blocks
+    if gap_length > 1:
+        block_length += 1
+        gap_length -= 1
+    #print(f"section_length is still {section_length}")
+    #print(f"gap_length is {gap_length}")
+    #print(f"block_length is {block_length}")
+
+    values = list(a / (block_length - 1) for a in range(block_length))
+    #print(values, "\n")
+    
+    for count in range(number_of_blocks):
+        if count <= gap_size:
+            boost = count
+        else:
+            boost = gap_size
+        new_block = list(a + (count * section_length) + boost for a in range(block_length))
+        #print(f"got a block like this : {new_block}")
+        blocks.append(new_block)
+        colours.append(count / number_of_blocks)
+
+
+    #for steps in range(pixel_count * 3):
+    for _ in range(steps):
+        for point in range(block_length):
+            for count, block in enumerate(blocks):
+                block[point] += 1
+                block[point] = block[point]%pixel_count
+                state[block[point]] = (colours[count],1,values[point])
+        update_led_string(led_strip, pixel_count, indicies, state)
+        time.sleep(0.1)
+    print("... All Done ...")
 
 # Start 'dark'
 print("step 0")
@@ -77,143 +180,17 @@ indicies = list(range(NUM_LEDS))
 state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (1,1,0))
 update_led_string(led_strip, NUM_LEDS, indicies, state)
 
-# Fade in a nice set of repeating colours
-print("step 1a")
-old_state = state
-new_state = state_setters.make_multi_colour_state_tuple(NUM_LEDS)     
-transition = fade_to_state_HSV_a(NUM_LEDS, old_state, new_state, steps=20)
-for state in transition:
-    update_led_string(led_strip, NUM_LEDS, indicies, state)
-    time.sleep(0.1)
-
-time.sleep(10)
-
-# Fade to black
-print("step 2a")
-old_state = state
-new_state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (1,1,0))
-transition = fade_to_state_HSV_a(NUM_LEDS, old_state, new_state, steps=20)
-for state in transition:
-    update_led_string(led_strip, NUM_LEDS, indicies, state)
-    time.sleep(0.1)
-
-# Fade in a nice set of repeating colours
-print("step 1b")
-old_state = state
-new_state = state_setters.make_multi_colour_state_tuple(NUM_LEDS)     
-transition = fade_to_state_HSV_b(NUM_LEDS, old_state, new_state, steps=20)
-for state in transition:
-    update_led_string(led_strip, NUM_LEDS, indicies, state)
-    time.sleep(0.1)
-
-time.sleep(10)
-
-# Fade to black
-print("step 2b")
-old_state = state
-new_state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (1,1,0))
-transition = fade_to_state_HSV_b(NUM_LEDS, old_state, new_state, steps=20)
-for state in transition:
-    update_led_string(led_strip, NUM_LEDS, indicies, state)
-    time.sleep(0.1)
-
-#=- for _ in range(NUM_LEDS):
-#=- #for _ in range(len(state1) + len(state2) + len(state3) + len(state4) + NUM_LEDS):
-#=-     update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS])
-#=-     time.sleep(.5)
-#=-     state = state[1:] + [state[0]]
-#=-     inner_count +=1
-#=-     if inner_count % 15 == 0:
-#=-         print(f"Inner count is {inner_count} : outer count is {outer_count}, state is {len(state)} long")
-#=-     if inner_count % (2* len(state)) == 0:
-#=-         print("Transitioning")
-#=-         outer_count +=1
-#=-         outer_count = outer_count % len(states)
-#=-         inner_count = 0
-#=-         for i in range(len(states[outer_count])):
-#=-             state = state[1:]
-#=-             state.append(states[outer_count][i])
-#=-             update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS])
-#=-             if i%10 ==0:
-#=-                 print(f"step {i}")
-#=-             time.sleep(.5)
-
-
+# Create some colour blocks and zoom them round the string
+print("step 1")
+zooming_blocks(NUM_LEDS, [0,0,0,0,0], [0,0,0,0,0], steps=NUM_LEDS*3, number_of_blocks=2, gap_ratio=3)
+print("step 2")
+bouncing_blocks(NUM_LEDS, [0,0,0,0,0], [0,0,0,0,0], steps=NUM_LEDS*2, number_of_blocks=5, gap_ratio=1)
 print("step 3")
-old_state = state
-new_state = state_setters.make_rainbow_state_HSV(NUM_LEDS, arc_length=360,
-                                                 value=0.75)     
-transition = fade_to_state_HSV_a(NUM_LEDS, old_state, new_state, steps=20)
-for state in transition:
-    update_led_string(led_strip, NUM_LEDS, indicies, state, colour_type='HSV')
-    time.sleep(0.1)
-
-time.sleep(5)
-
-print("step 4")
-for _ in range(NUM_LEDS * 2):
-    old_state = state
-    new_state = state[1:] + [state[0]]
-    transition = fade_to_state_HSV_a(NUM_LEDS, old_state, new_state, steps=10)
-    for state in transition:
-        update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS], colour_type='HSV')
-        time.sleep(0.05)
-
-print("step 5")
-for _ in range(NUM_LEDS * 2):
-    old_state = state
-    new_state = [state[-1]] + state[0:-1]
-    transition = fade_to_state_HSV_a(NUM_LEDS, old_state, new_state, steps=10)
-    for state in transition:
-        update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS], colour_type='HSV')
-        time.sleep(0.05)
-
-
-# Fade to black
-print("step 6")
-old_state = state
-new_state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (1,1,0))
-transition = fade_to_state_HSV_a(NUM_LEDS, old_state, new_state, steps=20)
-for state in transition:
+for _ in range(50):
+    print("here we go...")
+    number_of_blocks = random.randint(1,11)
+    gap_ratio = random.random() * 4
+    zooming_blocks(NUM_LEDS, [0,0,0,0,0], [0,0,0,0,0], steps=NUM_LEDS*5, number_of_blocks=number_of_blocks, gap_ratio=gap_ratio)
     update_led_string(led_strip, NUM_LEDS, indicies, state)
-    time.sleep(0.1)
 
-print("step 7")
-old_state = state
-new_state = state_setters.make_rainbow_state_HSV(NUM_LEDS, arc_length=360,
-                                                 value=0.75)     
-transition = fade_to_state_HSV_b(NUM_LEDS, old_state, new_state, steps=20)
-for state in transition:
-    update_led_string(led_strip, NUM_LEDS, indicies, state, colour_type='HSV')
-    time.sleep(0.1)
-
-time.sleep(5)
-
-print("step 8")
-for _ in range(NUM_LEDS * 2):
-    old_state = state
-    new_state = state[1:] + [state[0]]
-    transition = fade_to_state_HSV_b(NUM_LEDS, old_state, new_state, steps=10)
-    for state in transition:
-        update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS], colour_type='HSV')
-        time.sleep(0.05)
-
-print("step 9")
-for _ in range(NUM_LEDS * 2):
-    old_state = state
-    new_state = [state[-1]] + state[0:-1]
-    transition = fade_to_state_HSV_b(NUM_LEDS, old_state, new_state, steps=10)
-    for state in transition:
-        update_led_string(led_strip, NUM_LEDS, indicies, state[:NUM_LEDS], colour_type='HSV')
-        time.sleep(0.05)
-
-
-# Fade to black
-print("step 10")
-old_state = state
-new_state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (1,1,0))
-transition = fade_to_state_HSV_b(NUM_LEDS, old_state, new_state, steps=20)
-for state in transition:
-    update_led_string(led_strip, NUM_LEDS, indicies, state)
-    time.sleep(0.1)
 
