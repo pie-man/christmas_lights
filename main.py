@@ -38,7 +38,7 @@ while True :
     print("here we go... again...")
     number_of_blocks = random.randint(1,11)
     gap_ratio = random.random() * 4
-    number_of_steps = NUM_LEDS * random.randint(1,5)
+    number_of_steps = NUM_LEDS * random.randint(2,6)
     print(f"number of blocks is {number_of_blocks}")
     print(f"gap ratio is        {gap_ratio}")
     print(f"number of steps  is {number_of_steps}")
@@ -49,5 +49,6 @@ while True :
     for state in actor :
         update_led_string(led_strip, NUM_LEDS, indicies, state)
         time.sleep(0.1)
+    time.sleep(10)
 
 
