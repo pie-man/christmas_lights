@@ -5,7 +5,10 @@ import random
 import pixel_strings_state_setters as state_setters
 from pixel_strings_actors import fade_to_state_HSV_a, fade_to_state_HSV_b
 
-NUM_LEDS = 100 # Total nuber of LEDs in the strings (including any ignored ones)
+ NUM_LEDS = 50 # Total nuber of LEDs in the strings (including any ignored ones)
+
+TIMES_TO_REPEAT = 60
+
 state = [(0, 1.0, 0.0) * NUM_LEDS]
 
 # The onboard LED - probably don't need it...
@@ -103,7 +106,7 @@ def bouncing_blocks(pixel_count, indecies, colour, steps=25, length_of_block=6, 
             state[pixel_index] = block_values[index]
             
         #update _all_ the pixels
-        update_led_string(led_strip, pixel_count, range(100), state)
+        update_led_string(led_strip, pixel_count, range(NUM_LEDS), state)
         time.sleep(0.1)
     print("... All Done ...")
 
@@ -115,7 +118,7 @@ update_led_string(led_strip, NUM_LEDS, indicies, state)
 
 # Create some colour blocks and zoom them round the string
 print("step 1")
-for _ in range(50):
+for _ in range(TIMES_TO_REPEAT):
     indicies = list(range(NUM_LEDS))
     state = state_setters.make_single_colour_state_tuple(NUM_LEDS, (1,1,0))
     update_led_string(led_strip, NUM_LEDS, indicies, state)

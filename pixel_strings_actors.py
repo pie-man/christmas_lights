@@ -1,12 +1,42 @@
 import time
 from random import randint
+from pixel_strings_ext_libs import update_led_string
  
- 
+''' The original 'actors' were iterables defined to yeild a given number of
+    updates to pixels.
+    The presumption being that the 'string' had been notionally divided into
+    'sections' upon which an 'actor' acted. The numder of 'steps' for a
+    collection of 'actors' was the same and thus as the main loop stepped
+    through the updates, all the sections updated at once.
+    The original 'sections' were three horizontal loops of the tree all formed
+    from the same single string. It even had to include pixels that were between
+    the 'loops' and never got illuminated.
+    
+    In this 'new' iteration of the code, a decision needs to be made as to what
+    the interface looks like. i.e. what the actors all need to be provided with
+    whether they update thier respective sections of string, or just pass a
+    state update (full or partial) back to the main loop for it to update the
+    actual string.
+    
+    count (in) : number of pixels this actor is selecting colours for
+    steps (in) : number of 'states' the actor will yield
+    old_state (optional?) : the 'state' of the pixels at the start of this
+                            actor's tenure. For example actors which manipulate
+                            a given state over time, such as rotating it aorund
+                            the string, or fading from it to something else.
+    new_state (optional?) : For actors where the final state wants to defined
+                            exteranlly, such as a fade to black (white, other)
+    For states which rely on some kind of calculation, such as bouncing or
+    zooming blocks - other parameters will be required to define the numebr and
+    lengths of the blocks, pluss possibly the fade times etc.
+'''
+
 def fade_to_state_HSV_a(count, old_state, new_state, steps=25):
     ''' A function to fade from one 'state' to another.
     This function assumes both 'states' are of length 'count' and that they are lists of tuples defining a colour in terms of Hue, Saturation and Value.
     Normally, to fade from one colour to another, you just alter 'Hue', but if the target colour is white or black, you actually want to adjust saturation or value respectively. (Once you've got to white, or black, for belt-n-braces then adjust the Hue to whatever was provided so the next transition starts with whatever the coder had in mind.)
     '''
+    print(f"In fade_to_state_HSV_a for {count} steps")
     transition_tuples = []
     for pixel in range(count):
         if new_state[pixel][1] == 0: # Saturation == 0, new colour is white
@@ -33,6 +63,7 @@ def fade_to_state_HSV_b(count, old_state, new_state, steps=25):
     This varient doesn't attempt to do anything 'clever' it justs fades from one set of HSV to another (rolling over
     the HUE boundary if that's shorter than traversing within bounds)
     '''
+    print(f"In fade_to_state_HSV_b for {count} steps")
     fake_state = [] # This allows for special fades to black or white, plus shortest route through Hue
     for pixel in range(count):
         fake_pixel_hue, fake_pixel_sat, fake_pixel_val = new_state[pixel]
@@ -58,6 +89,147 @@ def fade_to_state_HSV_b(count, old_state, new_state, steps=25):
     # what was expected even if we went clever on fades to white or black
     yield new_state
 
+def zooming_blocks(pixel_count, old_state, new_state, steps=25, number_of_blocks=6, gap_ratio=1.0):
+    '''
+    Messy bit of demo code which creates a number of 'blocks' (default=6) each
+    of a randomly selected colour eveny spaced out along the length of the
+    pixel string. The length of the gaps between each block is determined by
+    gap_ration (default 1.0) where the length of the gap is the length of the
+    'block' multiplied by gap_ratio all scaled to be integers such that
+    block_length + gap_length = section_length
+    and
+    section_length = total_numer_of_pixels_in_string / number_pf_blocks
+    '''
+    print(f"In Zooming Blocks for {steps} steps")
+    state = old_state
+    #noblocks = 6
+    if gap_ratio < 0.0:
+        gap_ratio = 0.0
+    section_length = int(pixel_count // number_of_blocks)
+    block_length = int(section_length // (1 + gap_ratio))
+    gap_length = section_length - block_length
+#     print(f"section_length is {section_length}")
+#     print(f"block_length is {block_length}")
+#     print(f"gap_length is {gap_length}\n")
+    while (gap_length / block_length) > gap_ratio:
+#         print(f"Calculated {gap_length / block_length}, prepare for lift off...")
+        gap_length -= 1
+        block_length +=1
+#     print(f"Final calculated {gap_length / block_length}, We are in orbit")
+    #print(f"section_length is {section_length}")
+    #print(f"block_length is {block_length}")
+    #print(f"gap_length is {gap_length}\n")
+
+    blocks=[]
+    colours = []
+    # Create a list of lists. Each lists contains a block of indecies for pixels
+    # This first bit is a really overengineered way to 'space' out the left over pixels..
+    # If there are more 'left over pixels than blocks - add one to the block length until there aren't
+    gap_size = pixel_count - (number_of_blocks * section_length)
+    print(f"Gap Size is {gap_size}")
+    while gap_size >= number_of_blocks:
+#         print("A quick lap of the moon folks....\n")
+        block_length += 1
+        gap_size -= number_of_blocks
+    if gap_length > 1:
+        block_length += 1
+        gap_length -= 1
+#     print(f"section_length is still {section_length}")
+#     print(f"gap_length is {gap_length}")
+#     print(f"block_length is {block_length}")
+
+    values = list(a / (block_length - 1) for a in range(block_length))
+    #print(values, "\n")
+    
+    for count in range(number_of_blocks):
+        if count <= gap_size:
+            boost = count
+        else:
+            boost = gap_size
+        new_block = list(a + (count * section_length) + boost for a in range(block_length))
+        #print(f"got a block like this : {new_block}")
+        blocks.append(new_block)
+        colours.append(count / number_of_blocks)
+
+    for _ in range(steps):
+        for point in range(block_length):
+            count = 0
+            for block in blocks:
+                block[point] += 1
+                block[point] = block[point]%pixel_count
+                state[block[point]] = (colours[count],1,values[point])
+                count += 1
+        #update_led_string(led_strip, pixel_count, indicies, state)
+        yield state
+        #time.sleep(0.1)
+    print("... All Done ...")
+    yield new_state
+
+def bouncing_blocks(pixel_count, old_state, new_state, steps=25, number_of_blocks=6, gap_ratio=1.0):
+    print(f"In Bouncing Blocks for {steps} steps")
+    #noblocks = 6
+    state = old_state
+    if gap_ratio < 0.0:
+        gap_ratio = 0.0
+    section_length = int(pixel_count // number_of_blocks)
+    block_length = int(section_length // (1 + gap_ratio))
+    gap_length = section_length - block_length
+    #print(f"section_length is {section_length}")
+    #print(f"block_length is {block_length}")
+    #print(f"gap_length is {gap_length}\n")
+    while (gap_length / block_length) > gap_ratio:
+        #print(f"Calculated {gap_length / block_length}, prepare for lift off...")
+        gap_length -= 1
+        block_length +=1
+    #print(f"Final calculated {gap_length / block_length}, We are in orbit")
+    #print(f"section_length is {section_length}")
+    #print(f"block_length is {block_length}")
+    #print(f"gap_length is {gap_length}\n")
+
+    blocks=[]
+    colours = []
+    # Create a list of lists. Each lists contains a block of indecies for pixels
+    # This first bit is a really overengineered way to 'space' out the left over pixels..
+    # If there are more 'left over pixels than blocks - add one to the block length until there aren't
+    gap_size = pixel_count - (number_of_blocks * section_length)
+    #print(f"Gap Size is {gap_size}")
+    while gap_size >= number_of_blocks:
+        #print("A quick lap of the moon folks....\n")
+        block_length += 1
+        gap_size -= number_of_blocks
+    if gap_length > 1:
+        block_length += 1
+        gap_length -= 1
+    #print(f"section_length is still {section_length}")
+    #print(f"gap_length is {gap_length}")
+    #print(f"block_length is {block_length}")
+
+    values = list(a / (block_length - 1) for a in range(block_length))
+    #print(values, "\n")
+    
+    for count in range(number_of_blocks):
+        if count <= gap_size:
+            boost = count
+        else:
+            boost = gap_size
+        new_block = list(a + (count * section_length) + boost for a in range(block_length))
+        #print(f"got a block like this : {new_block}")
+        blocks.append(new_block)
+        colours.append(count / number_of_blocks)
+
+
+    #for steps in range(pixel_count * 3):
+    for _ in range(steps):
+        for point in range(block_length):
+            for count, block in enumerate(blocks):
+                block[point] += 1
+                block[point] = block[point]%pixel_count
+                state[block[point]] = (colours[count],1,values[point])
+        #update_led_string(led_strip, pixel_count, indicies, state)
+        yield state
+        #time.sleep(0.1)
+    print("... All Done ...")
+    yield new_state
 
 #=- def fade_to_state_rgb(pixels, index, new_state, steps=25, reverse=False):
 #=-     active_pixels = len(index)
