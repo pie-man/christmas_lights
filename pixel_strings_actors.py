@@ -106,6 +106,10 @@ def zooming_blocks(pixel_count, old_state, new_state, steps=25, number_of_blocks
     if gap_ratio < 0.0:
         gap_ratio = 0.0
     section_length = int(pixel_count // number_of_blocks)
+    if section_length < 5:
+        number_of_blocks = int(pixel_count // 5)
+        print(f"resetting number of blocks to {number_of_blocks} due to short section length")
+        section_length = int(pixel_count // number_of_blocks)
     block_length = int(section_length // (1 + gap_ratio))
     gap_length = section_length - block_length
 #     print(f"section_length is {section_length}")
@@ -172,7 +176,13 @@ def bouncing_blocks(pixel_count, old_state, new_state, steps=25, number_of_block
     if gap_ratio < 0.0:
         gap_ratio = 0.0
     section_length = int(pixel_count // number_of_blocks)
+    if section_length < 5:
+        number_of_blocks = int(pixel_count // 5)
+        print(f"resetting number of blocks to {number_of_blocks} due to short section length")
+        section_length = int(pixel_count // number_of_blocks)
     block_length = int(section_length // (1 + gap_ratio))
+    if block_length < 1:
+        block_length = 1
     gap_length = section_length - block_length
     #print(f"section_length is {section_length}")
     #print(f"block_length is {block_length}")
