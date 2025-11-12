@@ -194,3 +194,30 @@ def get_random_colour_RGB_arc(spread=360, offset=0,
     return HSV_2_RGB((hue_255, saturation_255, value_255))
  
 
+def randomiser(sequence):
+    ''' Function to randomise a sequence "in place", because micropython does
+        not have random.sample() '''
+    sequence_len = len(sequence)
+    for i in range(sequence_len):
+        j = random.randrange(sequence_len)
+        sequence[i], sequence[j] = sequence[j], sequence[i]
+        
+        
+def split_into_similar_lengths(section_length, no_subsections):
+    ''' Function to take an integer length and split it into a specified number
+        of integer sublengths. Any "left over" pixels are added randomly to enough
+        subsections such that the length of each subsection is n, or n+1.
+        Returns a list of the calculated lengths.'''
+    if no_subsections > section_length:
+        no_subsections = section_length
+    min_subsection_length = section_length // no_subsections
+    remainders = section_length % no_subsections
+    subsection_lengths = [min_subsection_length] * no_subsections
+    random_indecies = list(range(no_subsections))
+    randomiser(random_indecies)
+    while remainders > 0:
+        remainders -= 1
+        subsection_lengths[random_indecies.pop()] += 1
+    return subsection_lengths
+
+        
