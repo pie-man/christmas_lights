@@ -62,4 +62,3 @@ for _ in range(600):
     lights.update_strip_hsv()
     time.sleep(0.5)
 
-full_rainbow = 
