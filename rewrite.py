@@ -43,3 +43,23 @@ class LEDStrip:
 
 lights = LEDStrip(NUM_LEDS)
 
+lights.set_state([(200, 0, 200) for _ in range(NUM_LEDS)])
+lights.update_strip_rgb()
+time.sleep(2)
+
+random_start = random.randint(0, 360)
+arc_increments = 360 / NUM_LEDS
+for pixel in range(NUM_LEDS):
+    hue = ((pixel * arc_increments) + random_start) % 360
+    lights.set_pixel(pixel, (hue/360,  1, 0.5))
+lights.update_strip_hsv()
+
+for _ in range(600):
+    random_start = (random_start + arc_increments) % 360
+    for pixel in range(NUM_LEDS):
+        hue = ((pixel * arc_increments) + random_start) % 360
+        lights.set_pixel(pixel, (hue/360,  1, 0.5))
+    lights.update_strip_hsv()
+    time.sleep(0.5)
+
+full_rainbow = 
