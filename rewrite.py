@@ -40,3 +40,6 @@ class LEDStrip:
     def update_strip_rgb(self):
         for i in range(self.num_pixels):
             self.led_strip.set_rgb(i, *self.state[i])
+
+lights = LEDStrip(NUM_LEDS)
+
