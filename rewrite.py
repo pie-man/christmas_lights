@@ -105,10 +105,6 @@ lights.add_subsection('four', [x for x in range(30,40)],yellow(10))
 lights.add_subsection('five', [x for x in range(40,50)],magenta(10))
 lights.add_subsection('evens', [x for x in range(0,50,2)], red(25))
 lights.add_subsection('odds', [x for x in range(1,50,2)], blue(25))
-lights.add_subsection('A', [x for x in range(0,50,4)], red(13))
-lights.add_subsection('B', [x for x in range(1,50,4)], green(13))
-lights.add_subsection('C', [x for x in range(2,50,4)], blue(12))
-lights.add_subsection('D', [x for x in range(3,50,4)], yellow(12))
 
 lights.update_state_from_subsection('evens')
 lights.update_state_from_subsection('odds')
@@ -123,9 +119,9 @@ lights.update_state_from_subsection('five')
 lights.update_strip_hsv()
 time.sleep(3)
 
-sections = ['A', 'B', 'C', 'D']
+sections = ['A', 'B', 'C', 'D', 'E']
 no_of_sections = len(sections)
-colours = [red, green, blue, yellow]
+colours = [red, green, blue, yellow, magenta]
 for offset in range(150):
     for count, _ in enumerate(range(len(sections))):
         start = (count+offset) % no_of_sections
