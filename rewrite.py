@@ -129,3 +129,17 @@ lights.update_state_from_subsection('C')
 lights.update_state_from_subsection('D')
 lights.update_strip_hsv()
 time.sleep(3)
+
+sections = ['A', 'B', 'C', 'D']
+colours = [red, green, blue, yellow]
+for offset in range(100):
+    for count, _ in enumerate(range(len(sections))):
+        indecies = [x for x in range((count+offset) % len(sections), 50, len(sections))]
+        length = len(indecies)
+        lights.add_subsection(sections[count],
+                              indecies,
+                              colours[count](length))
+        #print(f"first index = {indecies[0]}, count = {count}")
+        lights.update_state_from_subsection(sections[count])
+    lights.update_strip_hsv()
+    time.sleep(2)
