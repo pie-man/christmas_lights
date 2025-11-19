@@ -3,6 +3,9 @@ import random
 from machine import Pin # type: ignore
 import plasma # type: ignore
 
+import pixel_strings_helper_fncs as fncs
+import pixel_strings_state_setters as states
+
 NUM_LEDS = 50 # Total number of LEDs in the strings (including any ignored ones)
 FPS = 60  # Frames per second
 PICO_LED = Pin('LED', Pin.OUT)
@@ -86,11 +89,11 @@ for _ in range(60):
 
 # Create some subsections...
 def red(count):
-    return [(0, 1 , 0.8) for x in range(count)]
+    return states.make_single_colour_state_tuple(count, fncs.RED_HSV)
 def green(count):
-    return [(120/360, 1 , 0.8) for x in range(count)]
+    return states.make_single_colour_state_tuple(count, fncs.GREEN_HSV)
 def blue(count):
-    return [(180/360, 1 , 0.8) for x in range(count)]
+    return states.make_single_colour_state_tuple(count, fncs.BLUE_HSV)
 def yellow(count):
     return [(60/360, 1 , 0.8) for x in range(count)]
 def cyan(count):
@@ -103,13 +106,14 @@ lights.add_subsection('two', [x for x in range(10,20)], green(10))
 lights.add_subsection('three', [x for x in range(20,30)], blue(10))
 lights.add_subsection('four', [x for x in range(30,40)],yellow(10))
 lights.add_subsection('five', [x for x in range(40,50)],magenta(10))
+
 lights.add_subsection('evens', [x for x in range(0,50,2)], red(25))
 lights.add_subsection('odds', [x for x in range(1,50,2)], blue(25))
 
 lights.update_state_from_subsection('evens')
 lights.update_state_from_subsection('odds')
 lights.update_strip_hsv()
-time.sleep(3)
+time.sleep(6)
 
 lights.update_state_from_subsection('one')
 lights.update_state_from_subsection('two')
@@ -117,7 +121,7 @@ lights.update_state_from_subsection('three')
 lights.update_state_from_subsection('four')
 lights.update_state_from_subsection('five')
 lights.update_strip_hsv()
-time.sleep(3)
+time.sleep(5)
 
 sections = ['A', 'B', 'C', 'D', 'E']
 no_of_sections = len(sections)

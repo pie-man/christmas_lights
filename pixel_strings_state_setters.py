@@ -13,11 +13,14 @@ the global one.
 
 from pixel_strings_helper_fncs import RED_HSV, YELLOW_HSV, GREEN_HSV, BLUE_HSV,\
                        MAGENTA_HSV, ORANGE_HSV
+import pixel_strings_helper_fncs as fncs
 
-def make_single_colour_state_tuple(count, colour_tuple):
+def make_single_colour_state_tuple(count, colour_tuple=None):
     '''Takes a count and a tuple defining an RGB or HSV colour.
     Returns a list, of length count, of the colour tuples''' 
     colour_state = []
+    if colour_tuple is None:
+        colour_tuple = [RED_HSV]
     for i in range(count):
         colour_state.append(colour_tuple)
     return colour_state
@@ -54,6 +57,26 @@ def make_rainbow_state_HSV(count, arc_start=0, arc_length=360,
     for pixel in range(count):
         hue = ((pixel * arc_increments) + arc_start) % 360
         rainbow_state.append((hue/360, saturation, value))
+    return rainbow_state
+
+def make_rainbow_state_RGB(count, arc_start=0, arc_length=360,
+                           saturation=1.0, value=1.0):
+    '''
+       Creates a list of 'count' RGB colour tuples spread evenly along an 'arc'
+       of length 'arc_length' degrees (could be 720 for 2 full rainbows)
+       starting from point 'arc_start'.
+       saturation and value default to 1 and are just passed through and used in
+       the returned tuples. Set value to a lower decimal, e.g. 0.75, to reduce
+       the brightness of the string.
+       This routine calls out to get an HSV state, and then converts to an RGB
+       one.
+    '''
+    rainbow_state = []
+    arc_increments = arc_length / count
+    for pixel in range(count):
+        hue = ((pixel * arc_increments) + arc_start) % 360
+        rgb_value = fncs.HSV_2_RGB((hue, saturation, value))
+        rainbow_state.append(rgb_value)
     return rainbow_state
 
 # : This block could be methods in a 'state' object
