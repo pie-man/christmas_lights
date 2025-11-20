@@ -142,10 +142,11 @@ lights.add_subsection('five', [x for x in range(40,50)],magenta(10))
 lights.add_subsection('evens', [x for x in range(0,50,2)], red(25))
 lights.add_subsection('odds', [x for x in range(1,50,2)], blue(25))
 
+print(f"ligting up alternate pixels in 2 colours for 5")
 lights.update_state_from_subsection('evens')
 lights.update_state_from_subsection('odds')
 lights.update_strip_hsv()
-time.sleep(2)
+time.sleep(5)
 
 print(f"5 blocks of solid colour for 5")
 lights.update_state_from_subsection('one')
