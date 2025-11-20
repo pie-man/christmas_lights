@@ -62,24 +62,24 @@ class LEDStrip:
         return self.num_pixels
     
     class SubSection:
-        def __init__(self, indecies=[0], state=[(0,0,0)]):
+        def __init__(self, indecies=[0], current_state=[(0,0,0)]):
             self.indecies = indecies
-            self.state = state
+            self.state = current_state
         def get_state(self):
             return self.state
         def get_indecies(self):
             return indecies
-        def update_state(self, state):
-            state_len = len(state)
+        def update_state(self, new_state):
+            state_len = len(new_state)
             if len(self.indecies) < state_len:
-                self.state = state(:len(indecies))
+                self.state = new_state[0:len(indecies)]
             elif len(self.indecies) > state_len:
-                extras = len(state) - len(self.indecies)
+                extras = len(new_state) - len(self.indecies)
                 count = 0
-                self.state = state
+                self.state = new_state
                 while extras > 0:
                     extras -= 1
-                    self.state.append(state[count])
+                    self.state.append(new_state[count])
                     count = (count + 1) % state_len
         
     

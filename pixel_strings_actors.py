@@ -39,7 +39,7 @@ from pixel_strings_ext_libs import update_led_string
 
 # Should this be 'elsewhere'? as it's not an 'actor'; the zooming blocks actors
 # used to use it.
-def section_subsplitting(pixel_count, number_of_blocks, gap_ratio
+def section_subsplitting(pixel_count, number_of_blocks, gap_ratio,
                          include_blank=False, max_blocks=False):
     '''
         Routine to break a length of pixels into subsections.
@@ -161,8 +161,8 @@ def zooming_blocks(pixel_count, old_state, new_state, steps=25, number_of_blocks
     state = old_state
 
     section_length, block_length, gap_length = section_subsplitting(
-                                        pixel_count, number_of_blocks, gap_ratio
-                                        include_blank=False, max_blocks=False):
+                                        pixel_count, number_of_blocks, gap_ratio,
+                                        include_blank=False, max_blocks=False)
     blocks=[]
     colours = []
     # Create a list of lists. Each lists contains a block of indecies for pixels
@@ -215,8 +215,8 @@ def bouncing_blocks(pixel_count, old_state, new_state, steps=25, number_of_block
     state = old_state
 
     section_length, block_length, gap_length = section_subsplitting(
-                                        pixel_count, number_of_blocks, gap_ratio
-                                        include_blank=False, max_blocks=False):
+                                        pixel_count, number_of_blocks, gap_ratio,
+                                        include_blank=False, max_blocks=False)
     blocks=[]
     colours = []
     # Create a list of lists. Each lists contains a block of indecies for pixels
