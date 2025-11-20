@@ -1,6 +1,5 @@
 import time
 from random import randint
-from pixel_strings_ext_libs import update_led_string
  
 ''' The original 'actors' were iterables defined to yeild a given number of
     updates to pixels.
