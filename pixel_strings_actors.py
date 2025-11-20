@@ -1,5 +1,6 @@
 import time
 from random import randint
+import pixel_strings_helper_fncs as fncs
  
 ''' The original 'actors' were iterables defined to yeild a given number of
     updates to pixels.
@@ -191,8 +192,8 @@ def zooming_blocks(pixel_count, old_state, new_state, steps=25, number_of_blocks
         new_block = list(a + (count * section_length) + boost for a in range(block_length))
         #print(f"got a block like this : {new_block}")
         blocks.append(new_block)
-        colours.append(count / number_of_blocks)
-
+        colours.append(randint(0,299)/360)
+    yield old_state
     for _ in range(steps):
         for point in range(block_length):
             count = 0
@@ -202,6 +203,7 @@ def zooming_blocks(pixel_count, old_state, new_state, steps=25, number_of_blocks
                 state[block[point]] = (colours[count],1,values[point])
                 count += 1
         #update_led_string(led_strip, pixel_count, indicies, state)
+        #print(f"Yeilding state : {state}")
         yield state
         #time.sleep(0.1)
     print("... All Done ...")
