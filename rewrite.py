@@ -91,7 +91,7 @@ class LEDStrip:
         self.subsections[name] = self.SubSection(indecies, state)
 
     def update_subsection(self, name, state):
-        print(f"Calling SubSection.update_state on {name} with {len(state)} pixels...")
+        #print(f"Calling SubSection.update_state on {name} with {len(state)} pixels...")
         self.subsections[name].update_state(state)
 
     
@@ -147,7 +147,7 @@ lights.update_state_from_subsection('odds')
 lights.update_strip_hsv()
 time.sleep(2)
 
-print(f"% blocks of solid colour for 5")
+print(f"5 blocks of solid colour for 5")
 lights.update_state_from_subsection('one')
 lights.update_state_from_subsection('two')
 lights.update_state_from_subsection('three')
@@ -226,5 +226,5 @@ for step in range(steps):
         #print(f"Updating state from subsection {section}")
         lights.update_state_from_subsection(section)
     lights.update_strip_hsv()
-    print(f"curently at step no {step}")
+    #print(f"curently at step no {step}")
     time.sleep(0.1)
