@@ -18,19 +18,27 @@ from pixel_strings_ext_libs import update_led_string
     state update (full or partial) back to the main loop for it to update the
     actual string.
     
-    count (in) : number of pixels this actor is selecting colours for
+    count (in) : number of pixels this actor is selecting colours for -or-
+                 could pass in the 'index' array for the section. 
+                 count would be len() of that and it should guarentee a match
+                 between the no. of pixels and the states, if provided.
     steps (in) : number of 'states' the actor will yield
     old_state (optional?) : the 'state' of the pixels at the start of this
                             actor's tenure. For example actors which manipulate
                             a given state over time, such as rotating it aorund
                             the string, or fading from it to something else.
-    new_state (optional?) : For actors where the final state wants to defined
+    new_state (optional?) : For actors where the final state wants to be defined
                             exteranlly, such as a fade to black (white, other)
     For states which rely on some kind of calculation, such as bouncing or
     zooming blocks - other parameters will be required to define the numebr and
     lengths of the blocks, pluss possibly the fade times etc.
+    Perhaps an abstract class to define a generic 'actor' which has the 4
+    attributes above, and abstract methods for 'next' or return an iterable
+    which can provide each of the states across a number of steps.
 '''
 
+# Should this be 'elsewhere'? as it's not an 'actor'; the zooming blocks actors
+# used to use it.
 def section_subsplitting(pixel_count, number_of_blocks, gap_ratio
                          include_blank=False, max_blocks=False):
     '''
@@ -78,7 +86,7 @@ def section_subsplitting(pixel_count, number_of_blocks, gap_ratio
     #print(f"block_length is {block_length}")
     #print(f"gap_length is {gap_length}\n")
 
-    return block_length
+    return section_length, block_length, gap_length
 
 def fade_to_state_HSV_a(count, old_state, new_state, steps=25):
     ''' A function to fade from one 'state' to another.
@@ -151,27 +159,6 @@ def zooming_blocks(pixel_count, old_state, new_state, steps=25, number_of_blocks
     '''
     print(f"In Zooming Blocks for {steps} steps")
     state = old_state
-    #noblocks = 6
-##=-     if gap_ratio < 0.0:
-##=-         gap_ratio = 0.0
-##=-     section_length = int(pixel_count // number_of_blocks)
-##=-     if section_length < 5:
-##=-         number_of_blocks = int(pixel_count // 5)
-##=-         print(f"resetting number of blocks to {number_of_blocks} due to short section length")
-##=-         section_length = int(pixel_count // number_of_blocks)
-##=-     block_length = int(section_length // (1 + gap_ratio))
-##=-     gap_length = section_length - block_length
-##=- #     print(f"section_length is {section_length}")
-##=- #     print(f"block_length is {block_length}")
-##=- #     print(f"gap_length is {gap_length}\n")
-##=-     while (gap_length / block_length) > gap_ratio:
-##=- #         print(f"Calculated {gap_length / block_length}, prepare for lift off...")
-##=-         gap_length -= 1
-##=-         block_length +=1
-##=- #     print(f"Final calculated {gap_length / block_length}, We are in orbit")
-##=-     #print(f"section_length is {section_length}")
-##=-     #print(f"block_length is {block_length}")
-##=-     #print(f"gap_length is {gap_length}\n")
 
     section_length, block_length, gap_length = section_subsplitting(
                                         pixel_count, number_of_blocks, gap_ratio
@@ -222,31 +209,10 @@ def zooming_blocks(pixel_count, old_state, new_state, steps=25, number_of_blocks
     yield new_state
 
 def bouncing_blocks(pixel_count, old_state, new_state, steps=25, number_of_blocks=6, gap_ratio=1.0):
+    # I don't think this works yet....
     print(f"In Bouncing Blocks for {steps} steps")
     #noblocks = 6
     state = old_state
-##=-     if gap_ratio < 0.0:
-##=-         gap_ratio = 0.0
-##=-     section_length = int(pixel_count // number_of_blocks)
-##=-     if section_length < 5:
-##=-         number_of_blocks = int(pixel_count // 5)
-##=-         print(f"resetting number of blocks to {number_of_blocks} due to short section length")
-##=-         section_length = int(pixel_count // number_of_blocks)
-##=-     block_length = int(section_length // (1 + gap_ratio))
-##=-     if block_length < 1:
-##=-         block_length = 1
-##=-     gap_length = section_length - block_length
-##=-     #print(f"section_length is {section_length}")
-##=-     #print(f"block_length is {block_length}")
-##=-     #print(f"gap_length is {gap_length}\n")
-##=-     while (gap_length / block_length) > gap_ratio:
-##=-         #print(f"Calculated {gap_length / block_length}, prepare for lift off...")
-##=-         gap_length -= 1
-##=-         block_length +=1
-##=-     #print(f"Final calculated {gap_length / block_length}, We are in orbit")
-##=-     #print(f"section_length is {section_length}")
-##=-     #print(f"block_length is {block_length}")
-##=-     #print(f"gap_length is {gap_length}\n")
 
     section_length, block_length, gap_length = section_subsplitting(
                                         pixel_count, number_of_blocks, gap_ratio

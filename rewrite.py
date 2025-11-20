@@ -5,6 +5,7 @@ import plasma # type: ignore
 
 import pixel_strings_helper_fncs as fncs
 import pixel_strings_state_setters as states
+import pixel_strings_actors as actors
 
 NUM_LEDS = 50 # Total number of LEDs in the strings (including any ignored ones)
 FPS = 60  # Frames per second
@@ -12,14 +13,6 @@ PICO_LED = Pin('LED', Pin.OUT)
 
 
 class LEDStrip:
-    class SubSection:
-        def __init__(self, indecies=[0], state=[(0,0,0)]):
-            self.indecies = indecies
-            self.state = state
-    
-    def add_subsection(self, name, indecies, state):
-        self.subsections[name] = self.SubSection(indecies, state)
-
     def __init__(self, num_pixels):
         self.num_pixels = num_pixels
         # Initialize all pixels to off (0, 0, 0)
@@ -64,6 +57,38 @@ class LEDStrip:
         colours = self.subsections[section_name].state
         for pixel, colour in zip(pixels, colours):
             self.set_pixel(pixel, colour)
+    
+    def get_no_pixels(self):
+        return self.num_pixels
+    
+    class SubSection:
+        def __init__(self, indecies=[0], state=[(0,0,0)]):
+            self.indecies = indecies
+            self.state = state
+        def get_state(self):
+            return self.state
+        def get_indecies(self):
+            return indecies
+        def update_state(self, state):
+            state_len = len(state)
+            if len(self.indecies) < state_len:
+                self.state = state(:len(indecies))
+            elif len(self.indecies) > state_len:
+                extras = len(state) - len(self.indecies)
+                count = 0
+                self.state = state
+                while extras > 0:
+                    extras -= 1
+                    self.state.append(state[count])
+                    count = (count + 1) % state_len
+        
+    
+    def add_subsection(self, name, indecies, state):
+        self.subsections[name] = self.SubSection(indecies, state)
+
+    def update_subsection(self, name, state):
+        self.subsections[name].update_state(state)
+
     
 
 lights = LEDStrip(NUM_LEDS)
@@ -126,15 +151,44 @@ time.sleep(5)
 sections = ['A', 'B', 'C', 'D', 'E']
 no_of_sections = len(sections)
 colours = [red, green, blue, yellow, magenta]
-for offset in range(150):
-    for count, _ in enumerate(range(len(sections))):
+for offset in range(120):
+    for count, section in enumerate(sections):
         start = (count+offset) % no_of_sections
         indecies = [x for x in range(start, 50, no_of_sections)]
         length = len(indecies)
-        lights.add_subsection(sections[count],
+        # There probably ought to be an 'update' subsection method...
+        lights.add_subsection(section,
                               indecies,
                               colours[count](length))
         #print(f"first index = {indecies[0]}, count = {count}")
         lights.update_state_from_subsection(sections[count])
+    lights.update_strip_hsv()
+    time.sleep(2)
+
+sections = ['A', 'B', 'C', 'D', 'E']
+section_actors = {}
+no_of_sections = len(sections)
+section_len = lights.get_no_pixels // no_of_sections
+extras = lights.get_no_pixels % no_of_sections
+prev_end = -1
+for section in sections:
+    start_pixel = prev_end + 1
+    section_indecies = list(range(start_pixel, section_len))
+    section_state = [(0,0,0) for x in range(section_len)]
+    prev_end += section_len
+    if extras > 0:
+        prev_end += 1
+        extras -= 1
+    lights.add_subsection(section,section_indecies,section_state)
+
+steps = 120
+for section in sections:
+    section_actors[section] = actors.zooming_blocks(section_len,
+                                                    [(0,0,0) for x in range(section_len)],
+                                                    [(0,0,0) for x in range(section_len)],
+                                                    steps,1,1)
+for step in range(steps):
+    for section, section_actor in section_actors.items():
+        lights.update_subsection(section, next(section_actor))
     lights.update_strip_hsv()
     time.sleep(2)
