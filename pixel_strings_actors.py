@@ -209,57 +209,47 @@ def zooming_blocks(pixel_count, old_state, new_state, steps=25, number_of_blocks
     print("... All Done ...")
     yield new_state
 
-def bouncing_blocks(pixel_count, old_state, new_state, steps=25, number_of_blocks=6, gap_ratio=1.0):
+def bouncing_blocks(pixel_count, old_state, new_state, steps=25,
+                    number_of_blocks=6, gap_ratio=1.0):
     # I don't think this works yet....
     print(f"In Bouncing Blocks for {steps} steps")
     #noblocks = 6
     state = old_state
-
-    section_length, block_length, gap_length = section_subsplitting(
-                                        pixel_count, number_of_blocks, gap_ratio,
-                                        include_blank=False, max_blocks=False)
-    blocks=[]
+    # The lists below are a throwback to when a string could have maultiple 'sections'
+    # which doesn't make much sense in this actor any more...
     colours = []
-    # Create a list of lists. Each lists contains a block of indecies for pixels
-    # This first bit is a really overengineered way to 'space' out the left over pixels..
-    # If there are more 'left over pixels than blocks - add one to the block length until there aren't
-    gap_size = pixel_count - (number_of_blocks * section_length)
-    #print(f"Gap Size is {gap_size}")
-    while gap_size >= number_of_blocks:
-        #print("A quick lap of the moon folks....\n")
-        block_length += 1
-        gap_size -= number_of_blocks
-    if gap_length > 1:
-        block_length += 1
-        gap_length -= 1
-    #print(f"section_length is still {section_length}")
-    #print(f"gap_length is {gap_length}")
-    #print(f"block_length is {block_length}")
-
-    values = list(a / (block_length - 1) for a in range(block_length))
-    #print(values, "\n")
-    
-    for count in range(number_of_blocks):
-        if count <= gap_size:
-            boost = count
-        else:
-            boost = gap_size
-        new_block = list(a + (count * section_length) + boost for a in range(block_length))
-        #print(f"got a block like this : {new_block}")
-        blocks.append(new_block)
-        colours.append(count / number_of_blocks)
-
-
-    #for steps in range(pixel_count * 3):
+    heads = []
+    directions = []
+    block_locs = []
+    block_length = int(pixel_count / (1.0 + gap_ratio))
+    for block_id in range(number_of_blocks):
+        # pick a random direction.
+        directions.append([-1,1][randint(0,1)])
+        # pick a random start point.point
+        heads.append(randint(0, pixel_count - 1))
+        # Populate the block locations, with them all at the 'head' point
+        block_locs.append([heads[-1] for x in range(block_length)])
+        # Pick a random colour
+        colours.append(fncs.get_random_colour_HSV_arc()[0])
     for _ in range(steps):
-        for point in range(block_length):
-            for count, block in enumerate(blocks):
-                block[point] += 1
-                block[point] = block[point]%pixel_count
-                state[block[point]] = (colours[count],1,values[point])
-        #update_led_string(led_strip, pixel_count, indicies, state)
+        for block_id in range(number_of_blocks):
+            head_loc = heads[block_id]
+            head_loc += directions[block_id]
+            if head_loc >= pixel_count:
+                directions[block_id] = -1
+                head_loc = pixel_count -2
+            if head_loc < 0:
+                directions[block_id] = +1
+                head_loc += 1
+            for point in range(block_length -1, 0, -1):
+                block_locs[block_id][point] = block_locs[block_id][point - 1]
+            block_locs[block_id][0] = head_loc
+            heads[block_id] = head_loc
+            for point in range(block_length -1, -1, -1):
+                value = (block_length - point - 1) / (block_length -1)
+                state[block_locs[block_id][point]] = (colours[block_id],1,value)
+        print(f"Heads are at {heads}")
         yield state
-        #time.sleep(0.1)
     print("... All Done ...")
     yield new_state
 

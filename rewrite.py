@@ -189,9 +189,9 @@ print(f"Number of extras is {extras}")
 start_pixel = 0
 for section in sections:
     if section in ['A','C']:
-        section_len = 10
+        section_len = 20
     else:
-        section_len = 30
+        section_len = 10
     end_pixel = start_pixel + section_len
     section_indecies = list(range(start_pixel, end_pixel))
     section_state = [(0,0,0) for x in range(section_len)]
@@ -204,17 +204,17 @@ for section in sections:
     lights.add_subsection(section,section_indecies,section_state)
     start_pixel = end_pixel
 
-steps = 1200
+steps = 200
 for section in sections:
     if section in ['A','C']:
         noblocks = 1
-        gaplen = 0
-        section_len = 10
+        gaplen = 1.0
+        section_len = 20
     else:
-        noblocks = 4
-        gaplen = 1
-        section_len = 30
-    section_actors[section] = actors.zooming_blocks(section_len,
+        noblocks = 2
+        gaplen = 1.0
+        section_len = 10
+    section_actors[section] = actors.bouncing_blocks(section_len,
                                                     [(0,0,0) for x in range(section_len)],
                                                     [(0,0,0) for x in range(section_len)],
                                                     steps,noblocks,gaplen)

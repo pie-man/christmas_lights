@@ -10,7 +10,7 @@ this may get complicated as previously 'actors' which animate lights accept
 line an 'offset' needs to be used to allow mapping betweeen a 'local' index and
 the global one.
 '''
-
+from random import randint
 # Define some set RGB colours by name
 RED_RGB               = (255,   0,   0)
 ORANGE_RGB            = (255, 127,   0)
