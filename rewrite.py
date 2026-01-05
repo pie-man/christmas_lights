@@ -96,6 +96,27 @@ class LEDStrip:
 
     
 
+class Actor:
+    def __init__(self, indices):
+        self.indices = indices  # List of integers
+        self.legth = len(indices)
+        self.current_state = [(0, 0, 0) for _ in range(self.legth)]
+        self.next_state = [(0, 0, 0) for _ in range(self.legth)]
+        self._iterator = iter(self.current_state)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return next(self._iterator)
+    def set_current_state(self, state):
+        if len(state) == self.legth:
+            self.current_state = state
+            self._iterator = iter(self.current_state)
+    def set_next_state(self, state):
+        if len(state) == self.legth:
+            self.next_state = state
+
 lights = LEDStrip(NUM_LEDS)
 
 print(f"Going pale purple for 5")

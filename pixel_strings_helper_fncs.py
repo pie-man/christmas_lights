@@ -194,3 +194,21 @@ def get_random_colour_RGB_arc(spread=360, offset=0,
     return HSV_2_RGB((hue_255, saturation_255, value_255))
  
 
+def shortest_route(a, b, cycle=360.0):
+    """Works out the direction to traverse a 'loop' via the shortest route
+    Assumption is a 'loop' is 360(degrees), but any length over which to
+    cycle could have been provided"""
+    distance = (a - b) % cycle
+    direction = 1 if distance >= cycle/2.0 else -1
+    return direction
+
+def quicksteps(a, b, steps, cycle=360.0):
+    """Returns a list, 'steps' long to move along a cyclic range, of length 'cycle'
+       to get from from 'a' to 'b' via the shortest route.
+       'a' and 'b' are both included in the list"""
+    steps = max(1, steps)
+    direction = shortest_route(a, b, cycle)
+    dist = (b - a)* direction%cycle
+    gap = direction * dist / (steps -1)
+    step_list = list([(a + (gap * i))%cycle for i in range(steps-1)]) + [b]
+    return step_list
